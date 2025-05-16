@@ -4,7 +4,10 @@ package snek;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.LayoutStyle;
+import javax.swing.SwingConstants;
 
 public class MenuPanel extends JPanel{
     private JButton onePlayer;
@@ -14,6 +17,7 @@ public class MenuPanel extends JPanel{
     private GroupLayout bLayout;
     private GroupLayout.SequentialGroup hGroup;
     private GroupLayout.SequentialGroup vGroup;
+    private JLabel buttonsTitle;
 
     public MenuPanel(){
         onePlayer = new JButton("one player");
@@ -21,12 +25,14 @@ public class MenuPanel extends JPanel{
         threePlayers = new JButton("three players");
         quit = new JButton("quit game");
         bLayout = new GroupLayout(this);
+        buttonsTitle = new JLabel("Choose difficulty level:", SwingConstants.CENTER);
 
         this.add(onePlayer);
         this.add(twoPlayers);
         this.add(threePlayers);
         this.add(quit);
         this.setLayout(bLayout);
+        this.add(buttonsTitle);
 
         //tworzy dziury między przyciskami
         bLayout.setAutoCreateGaps(true);
@@ -35,22 +41,30 @@ public class MenuPanel extends JPanel{
 
         hGroup = bLayout.createSequentialGroup();
 
-        hGroup.addGroup(bLayout.createParallelGroup().addComponent(onePlayer, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+        hGroup.addGroup(bLayout.createParallelGroup().addComponent(onePlayer,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
         hGroup.addGroup(bLayout.createParallelGroup(Alignment.TRAILING).
-            addComponent(twoPlayers, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).
-            addComponent(quit, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
-        hGroup.addGroup(bLayout.createParallelGroup().addComponent(threePlayers, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+            addComponent(buttonsTitle, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).
+            addComponent(twoPlayers,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).
+            addComponent(quit,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+        hGroup.addGroup(bLayout.createParallelGroup().addComponent(threePlayers,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
         
 
         bLayout.setHorizontalGroup(hGroup);
 
         vGroup = bLayout.createSequentialGroup();
         vGroup.addGroup(bLayout.createParallelGroup(Alignment.BASELINE).
-            addComponent(onePlayer, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(twoPlayers, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(threePlayers, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+            addComponent(buttonsTitle,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+        vGroup.addGroup(bLayout.createParallelGroup(Alignment.BASELINE).
+            addComponent(onePlayer,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(twoPlayers,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(threePlayers,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)).
+            addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
+                     GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE);
 
         vGroup.addGroup(bLayout.createParallelGroup(Alignment.BASELINE).
-            addComponent(quit, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+            addComponent(quit,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
         
         bLayout.setVerticalGroup(vGroup);
+
+        // bLayout.linkSize(SwingConstants.HORIZONTAL, onePlayer, twoPlayers, threePlayers, quit);
+        // bLayout.linkSize(SwingConstants.VERTICAL, onePlayer, twoPlayers, threePlayers, quit);
     }
 }
