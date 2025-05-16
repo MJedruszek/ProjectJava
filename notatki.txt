@@ -1,0 +1,99 @@
+Java - projekt
+Snake: jeden gracz, 2+1 AI
+Klasy:
+Snake_Part: fragment sneka, wie o swojej pozycji i o kierunku, w którym idzie (zna pozycję kolejnego, ale nie poprzedniego elementu, do wyświetlania) oraz którym jest elementem (też do wyświetlania)
+Snake: lista partów + poruszanie + kolizje + śmierć + wydłużanie (logika sneka)
+Fruit: owocek, wie o swojej pozycji i przy spawnie sprawdza, czy pozycja jest valid, jeśli nie zmienia ją do skutku. Po zjedzeniu spawnuje się ponownie w nowym miejscu (ten sam).
+Rock: kamyczek, wie o swojej pozycji i nie zmienia jej (tylko jest w jednym miejscu). Pojawia się na początku gry.
+Frog: zna swoją pozycję, ma opcje poruszania się. Po zjedzeniu idzie do kolejnej lokalizacji.
+Player_Controller: kontroluje sneka dla gracza (poruszanie się), obsługuje dla gracza zmianę kierunku. (czy jest potrzebne? Można użyć do tego Game_Controller, skoro to Snake odpowiada za poruszanie się i kolizje.)
+AI_Controller: kontroluje sneka dla AI (poruszanie się, wybór trasy do najbliższego owocka).
+Frog_Controller: kontroluje Frog dla AI, wybiera ścieżkę zapewniającą największą odległość od sneków w miarze taksówkowej.
+Board_Controller: obsługuje planszę, generuje na początku pozycje kamieni, owocków, żaby i węży (w tej kolejności, z uwzględnieniem kolizji)
+Game_Controller: obsługuje pętlę gry (start/restart, pętla gry, zapamiętanie wyniku i nazwy gracza, wyświetlenie odpowiedniego ekranu za pomocą funkcji klasy View_Game), stany gry i przekazuje input gracza do Player_Controller lub Snake. Kolejność wykonywania ruchów nie jest ważna, bo wszystko działa na innym wątku (będzie ich 5)
+View_Game: pokazuje odpowiedni ekran użytkownikowi.
+
+Pola klasy:
+Snake: wektor partów, kierunek ruchu (poprzedni), bool czy jest martwy, długość, bool czy AI
+Snake_Part: X, Y, pozycja kolejnego partu (do wyświetlania)
+Fruit, Rock: ta sama klasa, bool is_Rock wystarczy żeby to określić, do tego tylko pozycja
+Frog: X,Y
+Board_Controller: wektor owocków i kamieni, wektor Sneków, żaba
+Player_Controller: Pozycja Sneka gracza w wektorze, input gracza
+AI_Controller: Pozycja Sneka AI w wektorze (check czy nie jest zajęty przez drugie AI), input AI
+Game_Controller: stan gry, nazwa gracza, score (obliczony na koniec gry), Controllery (1 Player i tyle AI, ile gracz wybrał)
+View_Game: widoki
+
+Funkcje klasy:
+Snake: ruch, czy pole x,y jest w sneku (do kolizji)
+Snake_Part: ruch o 1 (wejdź na miejsce tego przed tobą, aktualizuj pozycję)
+Fruit, Rock: -
+Frog: ruch, obliczanie odległości od sneków
+Board: kolizje, spawnowanie, aktualizacja co klatkę
+Player_Controller: przekazanie inputu do Sneka
+AI_Controller: obliczenie ruchu, przekazanie inputu do Sneka
+Game_Controller: początek (wybór trybu gry, zmiana stanu, wyrysowanie planszy, inicjalizacja boarda), koniec (obliczanie score, wyświetlenie napisu koniec, po wciśnięciu czegokolwiek leci na początek), pętla główna (w wątkach uruchomione funkcje Player, AI, Board i Frog, aż do śmierci gracza)
+View_Game: wyświetl początek, wyświetl środek, wyświetl koniec 
+
+---
+
+Przed grą:
+1. Wyświetl opcje: wyjdź z gry, wejdź do gry (1, 2 lub 3 graczy)
+2. Wczytaj i wyświetl high scores (5) 
+3. Odbierz i przekaż info do board, który zapamięta ile jest sneków
+
+Na początek gry:
+1. Board znajduje miejsce dla Sneka 1,2 i 3, mówi im o nim
+2. Board generuje 5 owocków i 10 kamieni
+3. Board znajduje żabie miejsce, mówi jej o nim
+
+Jeden ruch, sneka:
+0. Jeśli jesteś martwy, return
+1. Spróbuj poruszyć się o 1 w kierunku dir
+2. Sprawdź, czy dalej żyjesz (board o tym mówi)
+3. Jeśli kamień, umrzyj (zmień stan na martwy); Jeśli owocek, urośnij (osobna funkcja) i idź; Jeśli żaba, urośnij x3 i idź
+3a) Jeśli snek, umrzyj (funkcja Snek.checkIfHit(x,y) do każdego z osobna, board się tym zajmuje) i umrzyj
+4. Zmień miejsce, w którym są twoje party (jeśli nie jesteś martwy)
+Finito
+
+Jeden ruch, froga:
+0. Jeśli twoja pozycja to -1,-1, to return
+1. Sprawdź, jaka jest twoja odległość od sneka 1, 2 i 3 (taksówkowa) i wybierz najbliższego (Snek.getPosX() i Snek.getPosY(), wybieramy tego, którego suma X i Y jest najmniejsza)
+2. Znajdź kierunek, który zapewni ci większą odległość od najbliższego sneka, jeśli jest dostępny (suma się zmniejsza, wystarczy zostawić pierwszą znalezioną ścieżkę)
+3. Pójdź w wybrany kierunek. Jeśli nie ma dobrego wyboru (nie ma drogi ucieczki), zostań na miejscu
+
+^^^
+Ignorujemy sytuację, w której sneki są w równej odległości od siebie. Wtedy nie ma dobrej opcji, więc idziemy w tą która ucieka od pierwszego znalezionego w tej odległości Sneka.
+
+Jeden ruch, boarda:
+1. Jeśli żaby nie ma na ekranie, znajdź jej miejsce (funkcja findEmpty(x,y), odpytująca też sneki w środku czy znalezione pole nie jest zajęte, funkcja Snek.checkIfHit(x,y)) i podaj jej je.
+2. Jeśli jest za mało owoców, wygeneruj miejsce tą samą funkcją i dodaj go do wektora.
+
+Na koniec gry: 
+1. Wyświetl wynik i go zapisz do pliku
+2. Wyświetl info o końcu
+3. Czekaj na input gracza (jakikolwiek)
+
+Czemu board musi wiedzieć, gdzie są sneki i żaba? Żeby funkcja kolizji była w boardzie, ponieważ wszystkie trzy sneki mogą umrzeć po kolizji zarówno z elementami boarda, jak i z drugim snekiem. Dlatego board trzyma wektor sneków w sobie, a w funkcjach sprawdzających, czy kolizja dla żaby i sneka, mamy też Snek.checkIfHit(x,y).
+
+Board wie, gdzie są sneki, one po każdym ruchu sprawdzają z nim, co się dzieje - dlatego wie, czy owocek ma zniknąć, czy nie (usuwa go od razu z wektora itemów)
+Board wie, gdzie jest żaba - ta przed każdym ruchem mówi mu, gdzie jest, i sprawdza czy może tam być, po śmierci board znajduje jej nowe miejsce
+^^^
+dwie różne funkcje : bool frog_check i int snek_check
+
+Funkcja kolizji boarda dla sneków:
+1. Jeśli nic tam nie ma, 0
+2. Jeśli jest tam owocek, 1 i usuń owocek z wektora owocków
+3. Jeśli jest tam kamień, zwróć 2
+4. Jeśli jest tam żaba, ustaw jej miejsce na -1, -1
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+Swift - narzędzie do grafiki w Javie, początki w Javie
+Aplikacja okienkowa - how?
+
+AWT - Abstract Window Toolkit, stara
+Swing - nowy, nie ma wbudowanych natywnych komponentów, wszystko rysowane od nowa przez twórcę.
+
+GUI - rozszerzamy JFrame (klasa) przechowująca okienko, w konstruktorze panele, przyciski, właściwości, widoczność i potem tworzymy w wątku EDT (dystrybucji zdarzeń, żeby ta obsługa działa się poza główną pętlą)
+
+JPanel - rozszerza JComponent, można dodawać tam wyświetlane elementy. Posiada metody paint() i paintComponent(), rysujące komponenty
