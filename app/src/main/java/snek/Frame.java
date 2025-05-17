@@ -8,14 +8,17 @@ public class Frame extends JFrame implements Runnable{
     private int HEIGHT=280;
     private GameController g_Controller;
     private int FPS = 30;
+    private MenuPanel mPanel;
+    private GamePanel gPanel;
     private Thread gameThread = new Thread(this); //implementuje runnable
 
     public Frame(){
         g_Controller = new GameController();
         gameThread.start();
-        MenuPanel panel = new MenuPanel(g_Controller);
+        mPanel = new MenuPanel(g_Controller);
+        gPanel = new GamePanel(g_Controller, WIDTH, HEIGHT);
         this.setSize(WIDTH, HEIGHT);
-        this.add(panel);
+        this.getContentPane().add(mPanel);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Snek");
         this.setVisible(true);
@@ -29,14 +32,33 @@ public class Frame extends JFrame implements Runnable{
         long currentTime;
 
         while(gameThread != null){
+            if(g_Controller.getState() == GameState.ONE_PLAYER){
+                this.getContentPane().removeAll();
+                this.getContentPane().add(gPanel);
+
+                System.out.println(g_Controller.getState());
+            }
+            else if(g_Controller.getState() == GameState.TWO_PLAYER){
+                this.getContentPane().removeAll();
+                this.getContentPane().add(gPanel);
+                System.out.println(g_Controller.getState());
+            }
+            else if(g_Controller.getState() == GameState.THREE_PLAYER){
+                this.getContentPane().removeAll();
+                this.getContentPane().add(gPanel);
+                System.out.println(g_Controller.getState());
+            }
+            else if(g_Controller.getState() == GameState.BEGGINING){
+                System.out.println(g_Controller.getState());
+            }
+            
             // AKTUALIZOWANIE POZYCJI GRACZA I PRZERYSOWYWANIE GO
             currentTime = System.nanoTime();
             delta += (currentTime - lastTime) / drawInterval;
             lastTime = currentTime;
             if(delta >= 1){
-                //update();
-                //repaint();
-                System.out.println(g_Controller.getState());
+                //update(g);
+                repaint();
                 delta--;
             }
         }
