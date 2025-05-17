@@ -32,8 +32,8 @@ Frog: ruch, obliczanie odległości od sneków
 Board: kolizje, spawnowanie, aktualizacja co klatkę
 Player_Controller: przekazanie inputu do Sneka
 AI_Controller: obliczenie ruchu, przekazanie inputu do Sneka
-Game_Controller: początek (wybór trybu gry, zmiana stanu, wyrysowanie planszy, inicjalizacja boarda), koniec (obliczanie score, wyświetlenie napisu koniec, po wciśnięciu czegokolwiek leci na początek), pętla główna (w wątkach uruchomione funkcje Player, AI, Board i Frog, aż do śmierci gracza)
-View_Game: wyświetl początek, wyświetl środek, wyświetl koniec 
+Game_Controller: początek (wybór trybu gry, zmiana stanu, inicjalizacja boarda), koniec (obliczanie score, po wciśnięciu czegokolwiek zmiana stanu na beggining), pętla główna (w wątkach uruchomione funkcje Player, AI, Board i Frog, aż do śmierci gracza)
+View_Game: wyświetl początek, wyświetl środek, wyświetl koniec - zamiast tego Frame, w którym panele robią rzeczy
 
 ---
 

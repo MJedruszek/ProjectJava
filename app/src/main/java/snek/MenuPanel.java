@@ -9,7 +9,10 @@ import javax.swing.JPanel;
 import javax.swing.LayoutStyle;
 import javax.swing.SwingConstants;
 
-public class MenuPanel extends JPanel{
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class MenuPanel extends JPanel implements ActionListener{
     private JButton onePlayer;
     private JButton twoPlayers;
     private JButton threePlayers;
@@ -18,12 +21,18 @@ public class MenuPanel extends JPanel{
     private GroupLayout.SequentialGroup hGroup;
     private GroupLayout.SequentialGroup vGroup;
     private JLabel buttonsTitle;
+    private GameController g_Controller;
 
-    public MenuPanel(){
+    public MenuPanel(GameController g){
+        g_Controller = g;
         onePlayer = new JButton("one player");
+        onePlayer.addActionListener(this);
         twoPlayers = new JButton("two players");
+        twoPlayers.addActionListener(this);
         threePlayers = new JButton("three players");
+        threePlayers.addActionListener(this);
         quit = new JButton("quit game");
+        quit.addActionListener(this);
         bLayout = new GroupLayout(this);
         buttonsTitle = new JLabel("Choose difficulty level:", SwingConstants.CENTER);
 
@@ -64,7 +73,23 @@ public class MenuPanel extends JPanel{
         
         bLayout.setVerticalGroup(vGroup);
 
-        // bLayout.linkSize(SwingConstants.HORIZONTAL, onePlayer, twoPlayers, threePlayers, quit);
-        // bLayout.linkSize(SwingConstants.VERTICAL, onePlayer, twoPlayers, threePlayers, quit);
+        //obsługa funkcji przycisków
+        
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() == onePlayer){
+            g_Controller.setState(GameState.ONE_PLAYER);
+        }
+        else if(e.getSource() == twoPlayers){
+            g_Controller.setState(GameState.TWO_PLAYER);
+        }
+        else if(e.getSource() == threePlayers){
+            g_Controller.setState(GameState.THREE_PLAYER);
+        }
+        else if(e.getSource() == quit){
+            System.exit(0);
+        }
     }
 }
