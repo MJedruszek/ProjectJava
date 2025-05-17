@@ -4,8 +4,8 @@ import javax.swing.JFrame;
 
 public class Frame extends JFrame implements Runnable{
     //okno, ustawienia początkowe
-    private int WIDTH=460;
-    private int HEIGHT=280;
+    private int WIDTH=1024+48;
+    private int HEIGHT=512+64;
     private GameController g_Controller;
     private int FPS = 30;
     private MenuPanel mPanel;
@@ -22,6 +22,7 @@ public class Frame extends JFrame implements Runnable{
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Snek");
         this.setVisible(true);
+        //this.setResizable(false);
     }
 
     @Override
@@ -36,20 +37,20 @@ public class Frame extends JFrame implements Runnable{
                 this.getContentPane().removeAll();
                 this.getContentPane().add(gPanel);
 
-                System.out.println(g_Controller.getState());
+                //System.out.println(g_Controller.getState());
             }
             else if(g_Controller.getState() == GameState.TWO_PLAYER){
                 this.getContentPane().removeAll();
                 this.getContentPane().add(gPanel);
-                System.out.println(g_Controller.getState());
+                //System.out.println(g_Controller.getState());
             }
             else if(g_Controller.getState() == GameState.THREE_PLAYER){
                 this.getContentPane().removeAll();
                 this.getContentPane().add(gPanel);
-                System.out.println(g_Controller.getState());
+                //System.out.println(g_Controller.getState());
             }
             else if(g_Controller.getState() == GameState.BEGGINING){
-                System.out.println(g_Controller.getState());
+                //System.out.println(g_Controller.getState());
             }
             
             // AKTUALIZOWANIE POZYCJI GRACZA I PRZERYSOWYWANIE GO

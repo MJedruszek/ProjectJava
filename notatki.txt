@@ -97,3 +97,7 @@ Swing - nowy, nie ma wbudowanych natywnych komponentów, wszystko rysowane od no
 GUI - rozszerzamy JFrame (klasa) przechowująca okienko, w konstruktorze panele, przyciski, właściwości, widoczność i potem tworzymy w wątku EDT (dystrybucji zdarzeń, żeby ta obsługa działa się poza główną pętlą)
 
 JPanel - rozszerza JComponent, można dodawać tam wyświetlane elementy. Posiada metody paint() i paintComponent(), rysujące komponenty
+
+
+Czy jako implementację rozumiemy tworzenie własnej implementacji interfejsu, czy wystarczy skorzystanie z cudzych?
+takich jak ActionListener i KeyListener?
