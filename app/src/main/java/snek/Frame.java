@@ -24,6 +24,8 @@ public class Frame extends JFrame implements Runnable{
         this.setSize(WIDTH, HEIGHT);
         this.getContentPane().add(mPanel);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
         this.setTitle("Snek");
         this.setVisible(true);
         this.setResizable(false);
@@ -37,7 +39,7 @@ public class Frame extends JFrame implements Runnable{
         double delta = 0;
         long lastTime = System.nanoTime();
         long currentTime;
-
+        
         while(menuThread != null){
             if(g_Controller.getState() == GameState.ONE_PLAYER){
                 this.getContentPane().removeAll();
@@ -59,6 +61,7 @@ public class Frame extends JFrame implements Runnable{
             }
             else if(g_Controller.getState() == GameState.BEGGINING){
                 //System.out.println(g_Controller.getState());
+                hasChanged = true;
             }
             
             // AKTUALIZOWANIE POZYCJI GRACZA I PRZERYSOWYWANIE GO
@@ -74,7 +77,14 @@ public class Frame extends JFrame implements Runnable{
     }
 
     private void update() {
+        try{
+            Thread.sleep(100);
+            }
+        catch(InterruptedException ex){
+            System.out.println("Exception");
+        }
         if(panelChanged){
+            System.out.println("THERE");
             hasChanged = false;
             panelChanged = false;
             repaint();

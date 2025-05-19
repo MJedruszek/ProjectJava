@@ -15,6 +15,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
     private Thread gameThread = new Thread(this); //implementuje runnable
     private int FPS = 30;
     private boolean something_changed;
+    private boolean gowno;
 
     public GamePanel(GameController g, int w, int h){
         g_Controller = g;
@@ -24,6 +25,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
         this.height = h;
         gameThread.start();
         something_changed = true;
+        gowno = false;
     }
 
 
@@ -46,6 +48,12 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
                 g.setColor(Color.RED);
             }
             g.fillRect(16+x*16, 16*y+16, 15, 15);
+        }
+        if(gowno){
+            g.setColor(Color.blue);
+            g.fillRect(16+10*16, 16*10+16, 20, 20);
+            gowno = false;
+            something_changed = true;
         }
         g.dispose();
     }
@@ -72,7 +80,8 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
     }
 
     private void update() {
-        if(something_changed){
+        if(something_changed && (g_Controller.getState() == GameState.ONE_PLAYER || g_Controller.getState() == GameState.TWO_PLAYER || g_Controller.getState() == GameState.THREE_PLAYER)){
+            System.out.println("HERE");
             repaint();
             something_changed = false;
         }
@@ -81,13 +90,13 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
 
     @Override
     public void keyTyped(KeyEvent e) {
-       repaint();
+        
     }
 
 
     @Override
     public void keyPressed(KeyEvent e) {
-        
+
     }
 
 
