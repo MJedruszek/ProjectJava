@@ -10,11 +10,15 @@ public class Frame extends JFrame implements Runnable{
     private int FPS = 30;
     private MenuPanel mPanel;
     private GamePanel gPanel;
-    private Thread gameThread = new Thread(this); //implementuje runnable
+    private Thread menuThread = new Thread(this); //implementuje runnable
+    //czy należy zmienić panel
+    private boolean panelChanged;
+    //czy panel nie został zmieniony
+    private boolean hasChanged;
 
     public Frame(){
         g_Controller = new GameController();
-        gameThread.start();
+        menuThread.start();
         mPanel = new MenuPanel(g_Controller);
         gPanel = new GamePanel(g_Controller, WIDTH, HEIGHT);
         this.setSize(WIDTH, HEIGHT);
@@ -22,7 +26,9 @@ public class Frame extends JFrame implements Runnable{
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Snek");
         this.setVisible(true);
-        //this.setResizable(false);
+        this.setResizable(false);
+        panelChanged = false;
+        hasChanged = true;
     }
 
     @Override
@@ -32,21 +38,23 @@ public class Frame extends JFrame implements Runnable{
         long lastTime = System.nanoTime();
         long currentTime;
 
-        while(gameThread != null){
+        while(menuThread != null){
             if(g_Controller.getState() == GameState.ONE_PLAYER){
                 this.getContentPane().removeAll();
                 this.getContentPane().add(gPanel);
-
+                if(hasChanged) panelChanged = true;
                 //System.out.println(g_Controller.getState());
             }
             else if(g_Controller.getState() == GameState.TWO_PLAYER){
                 this.getContentPane().removeAll();
                 this.getContentPane().add(gPanel);
+                if(hasChanged) panelChanged = true;
                 //System.out.println(g_Controller.getState());
             }
             else if(g_Controller.getState() == GameState.THREE_PLAYER){
                 this.getContentPane().removeAll();
                 this.getContentPane().add(gPanel);
+                if(hasChanged) panelChanged = true;
                 //System.out.println(g_Controller.getState());
             }
             else if(g_Controller.getState() == GameState.BEGGINING){
@@ -58,10 +66,18 @@ public class Frame extends JFrame implements Runnable{
             delta += (currentTime - lastTime) / drawInterval;
             lastTime = currentTime;
             if(delta >= 1){
-                //update(g);
-                repaint();
+                update();
+                //repaint();
                 delta--;
             }
+        }
+    }
+
+    private void update() {
+        if(panelChanged){
+            hasChanged = false;
+            panelChanged = false;
+            repaint();
         }
     }
 }
