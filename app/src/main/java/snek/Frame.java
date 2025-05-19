@@ -21,6 +21,7 @@ public class Frame extends JFrame implements Runnable{
         menuThread.start();
         mPanel = new MenuPanel(g_Controller);
         gPanel = new GamePanel(g_Controller, WIDTH, HEIGHT);
+        pack();
         this.setSize(WIDTH, HEIGHT);
         this.getContentPane().add(mPanel);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -84,7 +85,6 @@ public class Frame extends JFrame implements Runnable{
             System.out.println("Exception");
         }
         if(panelChanged){
-            System.out.println("THERE");
             hasChanged = false;
             panelChanged = false;
             repaint();

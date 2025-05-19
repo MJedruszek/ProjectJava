@@ -15,7 +15,9 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
     private Thread gameThread = new Thread(this); //implementuje runnable
     private int FPS = 30;
     private boolean something_changed;
-    private boolean gowno;
+    private boolean pauza;
+    private boolean not_pauza;
+
 
     public GamePanel(GameController g, int w, int h){
         g_Controller = g;
@@ -25,10 +27,19 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
         this.height = h;
         gameThread.start();
         something_changed = true;
-        gowno = false;
+        this.setFocusable(true);
+        this.addKeyListener(this);
+        pauza = false;
+        not_pauza = false;
     }
 
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        requestFocusInWindow();
+    }
 
+    @Override
     public void paintComponent(Graphics g){
         //jedna kratka ma 8x8 pixeli
         super.paintComponent(g);
@@ -49,11 +60,13 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
             }
             g.fillRect(16+x*16, 16*y+16, 15, 15);
         }
-        if(gowno){
+        if(pauza){
             g.setColor(Color.blue);
-            g.fillRect(16+10*16, 16*10+16, 20, 20);
-            gowno = false;
-            something_changed = true;
+            g.fillRect(16+16, 16+16, 30, 30);
+            pauza = false;
+        }
+        if(not_pauza){
+            not_pauza = false;
         }
         g.dispose();
     }
@@ -90,13 +103,20 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
 
     @Override
     public void keyTyped(KeyEvent e) {
-        
     }
 
 
     @Override
     public void keyPressed(KeyEvent e) {
-
+        if(e.getKeyChar()=='p'){
+            pauza = true;
+            something_changed = true;
+        }
+        else{
+            //System.out.println("NOT PAUZA");
+            not_pauza = true;
+            something_changed = true;
+        }
     }
 
 
