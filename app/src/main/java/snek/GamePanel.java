@@ -60,6 +60,14 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
             }
             g.fillRect(16+x*16, 16*y+16, 15, 15);
         }
+        g.setColor(Color.cyan);
+        for(int i = 0; i<g_Controller.getBoard().getSnakeSize(0); i++){
+            int x = g_Controller.getBoard().getSnakePart(i).getX();
+            int y = g_Controller.getBoard().getSnakePart(i).getY();
+            g.fillRect(16+x*16, 16*y+16, 15, 15);
+            g.setColor(Color.GREEN);
+        }
+
         if(pauza){
             g.setColor(Color.blue);
             g.fillRect(16+16, 16+16, 30, 30);
@@ -93,8 +101,10 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
     }
 
     private void update() {
+        //TODO:
+        //dodać tutaj repainta, jeśli board o tym powie, i wtedy powiedzieć boardowi żeby zmienił swoje zdanie
         if(something_changed && (g_Controller.getState() == GameState.ONE_PLAYER || g_Controller.getState() == GameState.TWO_PLAYER || g_Controller.getState() == GameState.THREE_PLAYER)){
-            System.out.println("HERE");
+            //System.out.println("HERE");
             repaint();
             something_changed = false;
         }

@@ -9,6 +9,7 @@ public class Board {
 
     private int width;
     private int height;
+    private PlayerSnake snek1;
     private int isTaken(int x, int y){
         for(Item i:  items){
             if(i.getX() == x && i.getY() == y){
@@ -49,11 +50,27 @@ public class Board {
         }
     }
 
+    private void generateSnek(){
+        boolean found = false;
+        while(!found){
+             Random rand = new Random();
+            int randomX = rand.nextInt((width));
+            int randomY = rand.nextInt((height));
+            if(isTaken(randomX, randomY) == 0){
+                if(isTaken(randomX-1, randomY) == 0){
+                    snek1 = new PlayerSnake(randomX, randomX-1, randomY, randomY);
+                    found = true;
+                }
+            }
+        }
+    }
+
     public Board(int width, int height){
         items = new ArrayList<>();
         this.width = width;
         this.height = height;
         generateAllItems();
+        generateSnek();
         for(Item i: items){
             System.out.print(i.getX());
             System.out.print(i.getY());
@@ -63,5 +80,19 @@ public class Board {
 
     public Item getItem(int i){
         return items.get(i);
+    }
+
+    public SnakePart getSnakePart(int i){
+        return snek1.getSnakePart(i);
+    }
+
+    public int getSnakeSize(int i){
+        if(i==0){
+            return snek1.getSnakeSize();
+        }
+        //TODO: dodać resztę sneków
+        else{
+            return 0;
+        }
     }
 }
