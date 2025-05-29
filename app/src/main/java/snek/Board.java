@@ -10,6 +10,7 @@ public class Board {
     private int width;
     private int height;
     private PlayerSnake snek1;
+    private Direction prev_dir;
     private int isTaken(int x, int y){
         for(Item i:  items){
             if(i.getX() == x && i.getY() == y){
@@ -21,9 +22,69 @@ public class Board {
                 }
             }
         }
-        //TODO: wąż do dodania, zwróci 2
+
+        if(snek1 != null && snek1.checkIfHit(x, y)){
+            return 2;
+        }
         //TODO: frog do dodania, zwróci 3
         return 0;
+    }
+
+    private int findFruitByPosition(int x, int y){
+        for(int i = 10; i<15; i++){
+            if(items.get(i).getX() == x && items.get(i).getY() == y){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int snakeGo(Direction dir, int s){
+        int result = 0;
+        if(
+            (dir == Direction.RIGHT && prev_dir == Direction.LEFT) ||
+            (dir == Direction.LEFT && prev_dir == Direction.RIGHT) ||
+            (dir == Direction.UP && prev_dir == Direction.DOWN) ||
+            (dir == Direction.DOWN && prev_dir == Direction.UP) 
+        ){
+            //nic nie robimy, kierunek niedozwolony
+        }
+        else{
+            prev_dir = dir;
+        }
+        if(s == 0){
+            //snake gracza
+            //znajdź nowe koordynaty sneka
+            int newx = snek1.getSnakePart(0).getX() + prev_dir.getX();
+            int newy = snek1.getSnakePart(0).getY() + prev_dir.getY();
+            //sprawdź, co na nich jest, i zwróć to
+            result= isTaken(newx, newy);
+        }
+        else{
+            //TODO: dodać case'y do pozostałych sneków
+            return 0;
+        }
+        //jeśli zjedliśmy owoc, dodaj nowy owoc
+        if(result == 1){
+            int fruit = findFruitByPosition(snek1.getSnakePart(0).getX() + prev_dir.getX(), snek1.getSnakePart(0).getY() + prev_dir.getY());
+            boolean found = false;
+            while(!found){
+                if(fruit == -1){
+                    //the fruit is a lie
+                    found = true;
+                }
+                Random rand = new Random();
+                int randomX = rand.nextInt((width));
+                int randomY = rand.nextInt((height));
+                if(isTaken(randomX, randomY) == 0){
+                    //znaleźliśmy dla niego miejsce, wsadzamy go tam
+                    found = true;
+                    items.get(fruit).setPosition(randomX, randomY);
+            }
+
+            }
+        }
+        return result;
     }
 
     private void addItem(boolean type){
@@ -71,6 +132,7 @@ public class Board {
         this.height = height;
         generateAllItems();
         generateSnek();
+        prev_dir = Direction.RIGHT;
         for(Item i: items){
             System.out.print(i.getX());
             System.out.print(i.getY());
@@ -94,5 +156,19 @@ public class Board {
         else{
             return 0;
         }
+    }
+
+    public boolean getSnakeStatus(int s){
+        if(s==0){
+            return snek1.getState();
+        }
+        else{
+            return false;
+        }
+    }
+
+    public void updatePlayerSnake(Direction dir){
+        int next = snakeGo(dir, 0); //sprawdzamy dla sneka gracza
+        snek1.move(dir, next); //snek idzie
     }
 }

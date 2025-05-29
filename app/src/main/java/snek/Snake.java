@@ -11,12 +11,16 @@ public interface Snake {
     //jeśli prev_dir i dir są przeciwstawne, zostaw prev_dir
     //jeśli nie, prev_dir = dir
     //czy umieram? pytam boarda
-    //jeśli jesteś martwy, zwracasz false (więc na początku, po sprawdzeniu martwości, zwracamy dalej false)
-    //jeśli żyjesz, zwracasz true
-    abstract boolean move(Direction dir, Direction prev_dir);
+    //jeśli jesteś martwy, zmień zmienną
+    //jeśli żyjesz, gitara
+    //jeśli snek jest żywy: powiększa sneka,
+    abstract void move(Direction dir, int status);
     
-    //wywoływana w move, na koniec, jeśli snek jest żywy: powiększa sneka, jeśli trzeba, i przesuwa party w określonym kierunku
+    //wywoływana w move, na koniec i przesuwa party w określonym kierunku
     abstract void update(Direction dir);
+
+    //dodaje num partów na koniec sneka
+    abstract void addPart(int num);
 
     //do przemieszczenia kawałka sneka na pozycję tego o 1 przed nim (zaczynamy od końca), głowa jest poruszana w update
     abstract void movePart(int pos);
@@ -27,4 +31,6 @@ public interface Snake {
     abstract SnakePart getSnakePart(int i);
 
     abstract int getSnakeSize();
+
+    abstract boolean getState();
 }

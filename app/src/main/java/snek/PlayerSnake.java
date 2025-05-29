@@ -17,28 +17,74 @@ public class PlayerSnake implements Snake{
 
     @Override
     public void movePart(int pos) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'movePart'");
+        if(pos == 0) return;
+        snek.get(pos).setX(snek.get(pos-1).getX());
+        snek.get(pos).setY(snek.get(pos-1).getY());
+    }
+
+    @Override
+    public void addPart(int num) {
+        for(int i = 0; i<num; i++){
+            snek.add(new SnakePart(snek.getLast().getX(), snek.getLast().getY()));
+        }
     }
 
     @Override
     public boolean checkIfHit(int x, int y) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'checkIfHit'");
+        boolean hit = false;
+        for(int i = 0; i < snek.size(); i++){
+            if(snek.get(i).getX() == x && snek.get(i).getY() == y){
+                hit = true;
+            }
+        }
+        return hit;
     }
 
 
     @Override
-    public boolean move(Direction dir, Direction prev_dir) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'move'");
+    public void move(Direction dir, int status) {
+        //jeśli jesteśmy martwi, nie ruszamy się
+        if(is_ded == true){
+            return;
+        } 
+        //właśnie umarliśmy, nie ruszamy się
+        if(status == 2){
+            is_ded = true;
+            return;
+        }
+
+        //jeśli nie umarliśmy, próbujemy się przesunąć w kierunku dir
+        //1. Czy ten kierunek jest przeciwny do poprzedniego? jeśli tak, nic nie zmieniamy
+        if(
+            (dir == Direction.RIGHT && prev_dir == Direction.LEFT) ||
+            (dir == Direction.LEFT && prev_dir == Direction.RIGHT) ||
+            (dir == Direction.UP && prev_dir == Direction.DOWN) ||
+            (dir == Direction.DOWN && prev_dir == Direction.UP) 
+        ){
+            //nic nie robimy, kierunek niedozwolony
+        }
+        else{
+            //kierunek dozwolony, idziemy tam
+            prev_dir = dir;
+        }
+        //jeśli zjedliśmy owocek, +1
+        if(status == 1){
+            addPart(1);
+        }
+        //idziemy 1 do przodu
+        update(prev_dir);
     }
 
 
     @Override
     public void update(Direction dir) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        //od tyłu przesuwamy wszystkie party
+        for(int i = snek.size()-1; i>0; i--){
+            movePart(i);
+        }
+        //przesuwamy głowę
+        snek.get(0).setX(snek.get(0).getX()+dir.getX());
+        snek.get(0).setY(snek.get(0).getY()+dir.getY());
     }
 
     @Override
@@ -49,6 +95,11 @@ public class PlayerSnake implements Snake{
     @Override
     public int getSnakeSize() {
         return snek.size();
+    }
+
+    @Override
+    public boolean getState() {
+        return is_ded;
     }
     
 }

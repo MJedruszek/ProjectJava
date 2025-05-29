@@ -13,10 +13,10 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
     private int width;
     private int height;   
     private Thread gameThread = new Thread(this); //implementuje runnable
-    private int FPS = 30;
+    private int FPS = 1;
     private boolean something_changed;
     private boolean pauza;
-    private boolean not_pauza;
+    private Direction dir;
 
 
     public GamePanel(GameController g, int w, int h){
@@ -29,8 +29,8 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
         something_changed = true;
         this.setFocusable(true);
         this.addKeyListener(this);
-        pauza = false;
-        not_pauza = false;
+        pauza = true;
+        dir = Direction.RIGHT;
     }
 
     @Override
@@ -60,7 +60,13 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
             }
             g.fillRect(16+x*16, 16*y+16, 15, 15);
         }
-        g.setColor(Color.cyan);
+        if(g_Controller.getBoard().getSnakeStatus(0)){
+            g.setColor(Color.RED);
+        }
+        else{
+            g.setColor(Color.cyan);
+        }
+        
         for(int i = 0; i<g_Controller.getBoard().getSnakeSize(0); i++){
             int x = g_Controller.getBoard().getSnakePart(i).getX();
             int y = g_Controller.getBoard().getSnakePart(i).getY();
@@ -69,25 +75,35 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
         }
 
         if(pauza){
-            g.setColor(Color.blue);
+            g.setColor(Color.magenta);
             g.fillRect(16+16, 16+16, 30, 30);
-            pauza = false;
-        }
-        if(not_pauza){
-            not_pauza = false;
         }
         g.dispose();
     }
 
     @Override
     public void run() {
-        double drawInterval = 1000000000 / FPS;
+        double drawInterval = 10000000 / FPS;
         double delta = 0;
         long lastTime = System.nanoTime();
         long currentTime;
 
         while(gameThread != null){
-            
+            //pętla do boarda:
+            if(!g_Controller.getBoard().getSnakeStatus(0) && !pauza){
+                g_Controller.getBoard().updatePlayerSnake(dir);
+                something_changed = true;
+                try {
+                    Thread.sleep(50);
+                    Thread.sleep(50);
+                    Thread.sleep(50);
+                    Thread.sleep(50);
+                    Thread.sleep(50);
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    System.out.println("Exception");
+                }
+            }
             
             // AKTUALIZOWANIE POZYCJI GRACZA I PRZERYSOWYWANIE GO
             currentTime = System.nanoTime();
@@ -100,9 +116,9 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
         }
     }
 
+
+
     private void update() {
-        //TODO:
-        //dodać tutaj repainta, jeśli board o tym powie, i wtedy powiedzieć boardowi żeby zmienił swoje zdanie
         if(something_changed && (g_Controller.getState() == GameState.ONE_PLAYER || g_Controller.getState() == GameState.TWO_PLAYER || g_Controller.getState() == GameState.THREE_PLAYER)){
             //System.out.println("HERE");
             repaint();
@@ -123,10 +139,23 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
             something_changed = true;
         }
         else{
-            //System.out.println("NOT PAUZA");
-            not_pauza = true;
+            pauza = false;
             something_changed = true;
         }
+
+        if(e.getKeyChar() == 'd'){
+            dir = Direction.RIGHT;
+        }
+        else if(e.getKeyChar() == 'w'){
+            dir = Direction.UP;
+        }
+        else if(e.getKeyChar() == 'a'){
+            dir = Direction.LEFT;
+        }
+        else if(e.getKeyChar() == 's'){
+            dir = Direction.DOWN;
+        }
+
     }
 
 
