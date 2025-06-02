@@ -67,9 +67,9 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
         if(g_Controller.getBoard().getSnakeStatus(0)){
             g.setColor(Color.WHITE);
             g.drawString("Press \"p\" to play again", 20, 40);
+            g.drawString("Score: " + g_Controller.getBoard().getSnakeSize(0), 20,80);
             g.setColor(Color.RED);
             if(pauza && g_Controller.getState() != GameState.END){
-                
                 g_Controller.setState(GameState.END);
             }
         }

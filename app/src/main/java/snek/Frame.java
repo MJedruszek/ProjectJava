@@ -1,5 +1,8 @@
 package snek;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.JFrame;
 
 public class Frame extends JFrame implements Runnable{
@@ -15,6 +18,7 @@ public class Frame extends JFrame implements Runnable{
     private boolean panelChanged;
     //czy panel nie został zmieniony
     private boolean hasChanged;
+    private List<Integer> highScores;
 
     public Frame(){
         g_Controller = new GameController();
@@ -32,6 +36,7 @@ public class Frame extends JFrame implements Runnable{
         this.setResizable(false);
         panelChanged = false;
         hasChanged = true;
+        highScores = new ArrayList<Integer>();
     }
 
     @Override
@@ -73,6 +78,12 @@ public class Frame extends JFrame implements Runnable{
                 if(g_Controller.getState() == GameState.END){
                     this.getContentPane().removeAll();
                     this.getContentPane().add(mPanel);
+                    highScores.add(g_Controller.getBoard().getSnakeSize(0));
+                    g_Controller.getBoard().reset();
+                    if(this.mPanel != null){
+                    mPanel.displayScores(highScores);
+                    g_Controller.setState(GameState.BEGGINING);
+                }
                     panelChanged = true;
                 }
                 update();

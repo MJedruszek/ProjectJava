@@ -11,6 +11,7 @@ public class Board {
     private int height;
     private PlayerSnake snek1;
     private Direction prev_dir;
+
     private int isTaken(int x, int y){
         for(Item i:  items){
             if(i.getX() == x && i.getY() == y){
@@ -105,6 +106,7 @@ public class Board {
     }
 
     private void generateAllItems(){
+        items.clear();
         //dodaj 10 kamieni
         for(int i = 0; i<10; i++){
             addItem(true);
@@ -173,5 +175,11 @@ public class Board {
     public void updatePlayerSnake(Direction dir){
         int next = snakeGo(dir, 0); //sprawdzamy dla sneka gracza
         snek1.move(dir, next); //snek idzie
+    }
+
+    public void reset(){
+        prev_dir = Direction.RIGHT;
+        generateAllItems();
+        generateSnek();
     }
 }

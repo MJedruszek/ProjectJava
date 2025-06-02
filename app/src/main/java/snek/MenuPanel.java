@@ -8,9 +8,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.LayoutStyle;
 import javax.swing.SwingConstants;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class MenuPanel extends JPanel implements ActionListener{
     private JButton onePlayer;
@@ -22,9 +22,11 @@ public class MenuPanel extends JPanel implements ActionListener{
     private GroupLayout.SequentialGroup vGroup;
     private JLabel buttonsTitle;
     private GameController g_Controller;
+    private JLabel label;
 
     public MenuPanel(GameController g){
         g_Controller = g;
+        label = new JLabel("<html>High scores: </html>", SwingConstants.CENTER);
         onePlayer = new JButton("one player");
         onePlayer.addActionListener(this);
         twoPlayers = new JButton("two players");
@@ -54,6 +56,7 @@ public class MenuPanel extends JPanel implements ActionListener{
         hGroup.addGroup(bLayout.createParallelGroup(Alignment.TRAILING).
             addComponent(buttonsTitle, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).
             addComponent(twoPlayers,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).
+            addComponent(label, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).
             addComponent(quit,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
         hGroup.addGroup(bLayout.createParallelGroup().addComponent(threePlayers,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
         
@@ -64,7 +67,9 @@ public class MenuPanel extends JPanel implements ActionListener{
         vGroup.addGroup(bLayout.createParallelGroup(Alignment.BASELINE).
             addComponent(buttonsTitle,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
         vGroup.addGroup(bLayout.createParallelGroup(Alignment.BASELINE).
-            addComponent(onePlayer,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(twoPlayers,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(threePlayers,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)).
+            addComponent(onePlayer,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(twoPlayers,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(threePlayers,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+        vGroup.addGroup(bLayout.createParallelGroup(Alignment.BASELINE).
+            addComponent(label,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)).
             addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
                      GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE);
 
@@ -91,5 +96,18 @@ public class MenuPanel extends JPanel implements ActionListener{
         else if(e.getSource() == quit){
             System.exit(0);
         }
+    }
+
+    public void displayScores(List<Integer> l){
+        String s = new String();
+        s = "<html>High scores: <br>";
+        if(!l.isEmpty()){
+            for(int i = 0; i<l.size(); i++){
+                s = s + "<br>";
+                s = s + l.get(i).toString();
+            }
+        }
+        s = s + "</html>";
+        label.setText(s);
     }
 }
