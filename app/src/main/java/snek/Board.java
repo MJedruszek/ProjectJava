@@ -26,6 +26,10 @@ public class Board {
         if(snek1 != null && snek1.checkIfHit(x, y)){
             return 2;
         }
+
+        if(x>width-1 || x<0 || y>height-1 || y<0){
+            return 2;
+        }
         //TODO: frog do dodania, zwróci 3
         return 0;
     }
@@ -115,8 +119,8 @@ public class Board {
         boolean found = false;
         while(!found){
              Random rand = new Random();
-            int randomX = rand.nextInt((width));
-            int randomY = rand.nextInt((height));
+            int randomX = rand.nextInt(3, (width - 3));
+            int randomY = rand.nextInt(3, (height - 3));
             if(isTaken(randomX, randomY) == 0){
                 if(isTaken(randomX-1, randomY) == 0){
                     snek1 = new PlayerSnake(randomX, randomX-1, randomY, randomY);
@@ -133,11 +137,6 @@ public class Board {
         generateAllItems();
         generateSnek();
         prev_dir = Direction.RIGHT;
-        for(Item i: items){
-            System.out.print(i.getX());
-            System.out.print(i.getY());
-            System.out.println(i.getType());
-        }
     }
 
     public Item getItem(int i){
@@ -165,6 +164,10 @@ public class Board {
         else{
             return false;
         }
+    }
+
+    public void update(){
+        
     }
 
     public void updatePlayerSnake(Direction dir){

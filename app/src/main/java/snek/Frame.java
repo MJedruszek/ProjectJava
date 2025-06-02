@@ -70,6 +70,11 @@ public class Frame extends JFrame implements Runnable{
             delta += (currentTime - lastTime) / drawInterval;
             lastTime = currentTime;
             if(delta >= 1){
+                if(g_Controller.getState() == GameState.END){
+                    this.getContentPane().removeAll();
+                    this.getContentPane().add(mPanel);
+                    panelChanged = true;
+                }
                 update();
                 //repaint();
                 delta--;

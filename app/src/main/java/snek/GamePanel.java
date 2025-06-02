@@ -2,6 +2,7 @@ package snek;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -13,10 +14,11 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
     private int width;
     private int height;   
     private Thread gameThread = new Thread(this); //implementuje runnable
-    private int FPS = 1;
+    private int FPS = 8;
     private boolean something_changed;
     private boolean pauza;
     private Direction dir;
+    private Font f;
 
 
     public GamePanel(GameController g, int w, int h){
@@ -31,6 +33,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
         this.addKeyListener(this);
         pauza = true;
         dir = Direction.RIGHT;
+        f = new Font("TimesRoman", Font.PLAIN, 30);
     }
 
     @Override
@@ -42,6 +45,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
     @Override
     public void paintComponent(Graphics g){
         //jedna kratka ma 8x8 pixeli
+        g.setFont(f);
         super.paintComponent(g);
         for(int x = 0; x<width/16-3;x++){
             for(int y = 0; y<height/16-4;y++){
@@ -61,7 +65,13 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
             g.fillRect(16+x*16, 16*y+16, 15, 15);
         }
         if(g_Controller.getBoard().getSnakeStatus(0)){
+            g.setColor(Color.WHITE);
+            g.drawString("Press \"p\" to play again", 20, 40);
             g.setColor(Color.RED);
+            if(pauza && g_Controller.getState() != GameState.END){
+                
+                g_Controller.setState(GameState.END);
+            }
         }
         else{
             g.setColor(Color.cyan);
@@ -74,42 +84,45 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
             g.setColor(Color.GREEN);
         }
 
-        if(pauza){
+        if(pauza && !g_Controller.getBoard().getSnakeStatus(0)){
             g.setColor(Color.magenta);
             g.fillRect(16+16, 16+16, 30, 30);
         }
+
         g.dispose();
     }
 
     @Override
     public void run() {
-        double drawInterval = 10000000 / FPS;
+        double drawInterval = 1000000000 / FPS;
         double delta = 0;
         long lastTime = System.nanoTime();
         long currentTime;
 
         while(gameThread != null){
             //pętla do boarda:
-            if(!g_Controller.getBoard().getSnakeStatus(0) && !pauza){
-                g_Controller.getBoard().updatePlayerSnake(dir);
-                something_changed = true;
-                try {
-                    Thread.sleep(50);
-                    Thread.sleep(50);
-                    Thread.sleep(50);
-                    Thread.sleep(50);
-                    Thread.sleep(50);
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    System.out.println("Exception");
-                }
-            }
             
+            //update - aktualizacja stanu planszy i powiedzieć snekom AI, co się zmieniło
+            //snakeGo dla wszystkich zakolejkowanych kierunków,
+            // żeby zabrać ze sobą ten case, kiedy dwa węże wejdą w to samo miejsce
+            //oraz ten, kiedy wchodzimy w cudzy ogon 
+            //+ snakeGov2 który sprawdzi, na jakiej pozycji znajdą się zaraz sneki, do sprawdzenia później (gdzie głowa, gdzie ogon)
             // AKTUALIZOWANIE POZYCJI GRACZA I PRZERYSOWYWANIE GO
+            //display - powiedz wszystkim, że coś się zmieniło -> move
+            
+            //do while - current time <= endOfFrame
+            //najpierw - czekamy na akcję AI i użytkownika, potem dajemy im info
+            //Oczekujemy na to, gdzie snek się chce poruszyć
             currentTime = System.nanoTime();
             delta += (currentTime - lastTime) / drawInterval;
             lastTime = currentTime;
             if(delta >= 1){
+                //listen subThreads
+                //dodatkowy while - czeka na kolejne przejśćie
+                if(!g_Controller.getBoard().getSnakeStatus(0) && !pauza){
+                g_Controller.getBoard().updatePlayerSnake(dir);
+                something_changed = true;
+            }
                 update();
                 delta--;
             }
@@ -163,8 +176,6 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
     public void keyReleased(KeyEvent e) {
        
     }
-
-
 
 
 
