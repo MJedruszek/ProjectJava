@@ -81,7 +81,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
             int x = g_Controller.getBoard().getSnakePart(i).getX();
             int y = g_Controller.getBoard().getSnakePart(i).getY();
             g.fillRect(16+x*16, 16*y+16, 15, 15);
-            g.setColor(Color.GREEN);
+            g.setColor(Color.PINK);
         }
 
         if(pauza && !g_Controller.getBoard().getSnakeStatus(0)){

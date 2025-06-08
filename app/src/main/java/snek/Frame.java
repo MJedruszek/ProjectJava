@@ -1,7 +1,12 @@
 package snek;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.swing.JFrame;
 
@@ -19,8 +24,10 @@ public class Frame extends JFrame implements Runnable{
     //czy panel nie został zmieniony
     private boolean hasChanged;
     private List<Integer> highScores;
+    private String f;
 
     public Frame(){
+        f = "snek_scores.txt";
         g_Controller = new GameController();
         menuThread.start();
         mPanel = new MenuPanel(g_Controller);
@@ -37,6 +44,9 @@ public class Frame extends JFrame implements Runnable{
         panelChanged = false;
         hasChanged = true;
         highScores = new ArrayList<Integer>();
+        //zapisywanie do highscores
+        readFromFile(f);
+        mPanel.displayScores(highScores);
     }
 
     @Override
@@ -83,6 +93,8 @@ public class Frame extends JFrame implements Runnable{
                     if(this.mPanel != null){
                     mPanel.displayScores(highScores);
                     g_Controller.setState(GameState.BEGGINING);
+                    //zapisywanie do pliku
+                    saveScores(f);
                 }
                     panelChanged = true;
                 }
@@ -104,6 +116,35 @@ public class Frame extends JFrame implements Runnable{
             hasChanged = false;
             panelChanged = false;
             repaint();
+        }
+    }
+
+    private void readFromFile(String filename){
+        try {
+            File mapFile = new File(filename);
+            Scanner myReader = new Scanner(mapFile);
+                        
+            while (myReader.hasNextLine()) {
+                String data = myReader.nextLine();
+                    highScores.add(Integer.parseInt(data));
+                }
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveScores(String filename){
+        try {
+            FileWriter myWriter = new FileWriter(filename);
+            for(int i = 0; i<highScores.size(); i++){
+                myWriter.write(highScores.get(i).toString() + "\n");
+            }
+            myWriter.close();
+        } 
+        catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
         }
     }
 }
