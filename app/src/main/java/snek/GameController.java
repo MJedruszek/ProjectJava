@@ -9,7 +9,7 @@ public class GameController {
         w = 64;
         h = 32;
         state = GameState.BEGGINING;
-        b = new Board(w,h);
+        b = new Board(w,h, 0);
     }
 
     public void setState(GameState s){

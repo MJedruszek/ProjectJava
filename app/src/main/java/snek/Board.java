@@ -1,5 +1,6 @@
 package snek;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -10,6 +11,8 @@ public class Board {
     private int width;
     private int height;
     private PlayerSnake snek1;
+    private AISnake snek2;
+    private AISnake snek3;
     private Direction prev_dir;
 
     private int isTaken(int x, int y){
@@ -25,6 +28,14 @@ public class Board {
         }
 
         if(snek1 != null && snek1.checkIfHit(x, y)){
+            return 2;
+        }
+
+        if(snek2 != null && snek2.checkIfHit(x, y)){
+            return 2;
+        }
+
+        if(snek3 != null && snek3.checkIfHit(x, y)){
             return 2;
         }
 
@@ -117,7 +128,7 @@ public class Board {
         }
     }
 
-    private void generateSnek(){
+    private void generateSnek(int i){
         boolean found = false;
         while(!found){
              Random rand = new Random();
@@ -125,35 +136,74 @@ public class Board {
             int randomY = rand.nextInt(3, (height - 3));
             if(isTaken(randomX, randomY) == 0){
                 if(isTaken(randomX-1, randomY) == 0){
-                    snek1 = new PlayerSnake(randomX, randomX-1, randomY, randomY);
+                    if(i == 0){
+                        snek1 = new PlayerSnake(randomX, randomX-1, randomY, randomY);
+                    }
+                    else if(i==1){
+                        snek2 = new AISnake(randomX, randomX-1, randomY, randomY);
+                    }
+
+                    else if(i==2){
+                        snek3 = new AISnake(randomX, randomX-1, randomY, randomY);
+                    }
+                    
                     found = true;
                 }
             }
         }
     }
 
-    public Board(int width, int height){
+    public Board(int width, int height, int s){
         items = new ArrayList<>();
         this.width = width;
         this.height = height;
         generateAllItems();
-        generateSnek();
         prev_dir = Direction.RIGHT;
+        generateSnek(0);
+        snek2 = null;
+        snek3 = null;
+        if(s == 0){
+            return;
+        }
+        generateSnek(1);
+        if(s == 1){
+            return;
+        }
+        generateSnek(2);
+        
     }
 
     public Item getItem(int i){
         return items.get(i);
     }
 
-    public SnakePart getSnakePart(int i){
-        return snek1.getSnakePart(i);
+    public SnakePart getSnakePart(int i, int s){
+        if(s == 0){
+            return snek1.getSnakePart(i);
+        }
+        else if(s == 1){
+            return snek2.getSnakePart(i);
+        }
+        else if(s==2){
+            return snek3.getSnakePart(i);
+        }
+        else{
+            return snek1.getSnakePart(0);
+        }
+
+        
     }
 
     public int getSnakeSize(int i){
         if(i==0){
             return snek1.getSnakeSize();
         }
-        //TODO: dodać resztę sneków
+        else if(i==1){
+            return snek2.getSnakeSize();
+        }
+        else if(i==2){
+            return snek3.getSnakeSize();
+        }
         else{
             return 0;
         }
@@ -162,6 +212,12 @@ public class Board {
     public boolean getSnakeStatus(int s){
         if(s==0){
             return snek1.getState();
+        }
+        else if(s==1){
+            return snek2.getState();
+        }
+        else if(s==2){
+            return snek3.getState();
         }
         else{
             return false;
@@ -177,9 +233,36 @@ public class Board {
         snek1.move(dir, next); //snek idzie
     }
 
-    public void reset(){
+    public void reset(int i){
         prev_dir = Direction.RIGHT;
         generateAllItems();
-        generateSnek();
+        generateSnek(0);
+        snek2 = null;
+        snek3 = null;
+        if(i == 0){
+            return;
+        }
+        generateSnek(1);
+        if(i == 1){
+            return;
+        }
+        generateSnek(2);
+        
+        
+    }
+
+    public Color getSnakeColor(int i, boolean head){
+        if(i == 0){
+            return snek1.getColor(head);
+        }
+        else if (i==1){
+            return snek2.getColor(head);
+        }
+        else if(i==2){
+            return snek3.getColor(head);
+        }
+        else{
+            return Color.blue;
+        }
     }
 }

@@ -1,5 +1,7 @@
 package snek;
 
+import java.awt.Color;
+
 public interface Snake {
     //funkcje do poruszania - kierunek i zmiana pozycji głowy
     //update pozycji - urośnij, przesuń party
@@ -33,4 +35,6 @@ public interface Snake {
     abstract int getSnakeSize();
 
     abstract boolean getState();
+
+    abstract Color getColor(boolean head);
 }

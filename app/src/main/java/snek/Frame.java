@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -60,19 +61,29 @@ public class Frame extends JFrame implements Runnable{
             if(g_Controller.getState() == GameState.ONE_PLAYER){
                 this.getContentPane().removeAll();
                 this.getContentPane().add(gPanel);
-                if(hasChanged) panelChanged = true;
+                if(hasChanged) {
+                    g_Controller.getBoard().reset(0);
+                    panelChanged = true;
+                }
+
                 //System.out.println(g_Controller.getState());
             }
             else if(g_Controller.getState() == GameState.TWO_PLAYER){
                 this.getContentPane().removeAll();
                 this.getContentPane().add(gPanel);
-                if(hasChanged) panelChanged = true;
+                if(hasChanged) {
+                    g_Controller.getBoard().reset(1);
+                    panelChanged = true;
+                }
                 //System.out.println(g_Controller.getState());
             }
             else if(g_Controller.getState() == GameState.THREE_PLAYER){
                 this.getContentPane().removeAll();
                 this.getContentPane().add(gPanel);
-                if(hasChanged) panelChanged = true;
+                if(hasChanged) {
+                    g_Controller.getBoard().reset(2);
+                    panelChanged = true;
+                }
                 //System.out.println(g_Controller.getState());
             }
             else if(g_Controller.getState() == GameState.BEGGINING){
@@ -89,12 +100,13 @@ public class Frame extends JFrame implements Runnable{
                     this.getContentPane().removeAll();
                     this.getContentPane().add(mPanel);
                     highScores.add(g_Controller.getBoard().getSnakeSize(0));
-                    g_Controller.getBoard().reset();
+                    g_Controller.getBoard().reset(0);
                     if(this.mPanel != null){
+                    saveScores(f);
                     mPanel.displayScores(highScores);
                     g_Controller.setState(GameState.BEGGINING);
                     //zapisywanie do pliku
-                    saveScores(f);
+                    
                 }
                     panelChanged = true;
                 }
@@ -135,9 +147,17 @@ public class Frame extends JFrame implements Runnable{
     }
 
     private void saveScores(String filename){
+        int size;
+        if(highScores.size()>10){
+            size = 10;
+        }
+        else{
+            size = highScores.size();
+        }
+        Collections.sort(highScores, Collections.reverseOrder());
         try {
             FileWriter myWriter = new FileWriter(filename);
-            for(int i = 0; i<highScores.size(); i++){
+            for(int i = 0; i<size; i++){
                 myWriter.write(highScores.get(i).toString() + "\n");
             }
             myWriter.close();

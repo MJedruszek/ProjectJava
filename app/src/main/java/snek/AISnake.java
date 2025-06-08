@@ -1,23 +1,23 @@
 package snek;
 
-import java.util.Vector;
 import java.awt.Color;
+import java.util.Vector;
 
-public class PlayerSnake implements Snake{
+public class AISnake implements Snake{
     private Direction prev_dir;
     private boolean is_ded;
     private Vector<SnakePart> snek = new Vector<SnakePart>();
     private Color headColor;
     private Color bodyColor;
 
-    public PlayerSnake(int x1, int x2, int y1, int y2){
+    public AISnake(int x1, int x2, int y1, int y2){
         prev_dir = Direction.RIGHT; //w prawo
         is_ded = false;
         //board inicjalizuje sneka, przekazuje mu dwa obok siebie miejsca na planszy (x1>x2, y1=y2)
         snek.add(new SnakePart(x1, y1));
         snek.add(new SnakePart(x2, y2));
-        headColor = Color.cyan;
-        bodyColor = Color.pink;
+        headColor = new Color(225, 140, 0);
+        bodyColor = Color.yellow;
     }
 
     @Override
@@ -60,19 +60,8 @@ public class PlayerSnake implements Snake{
         }
 
         //jeśli nie umarliśmy, próbujemy się przesunąć w kierunku dir
-        //1. Czy ten kierunek jest przeciwny do poprzedniego? jeśli tak, nic nie zmieniamy
-        if(
-            (dir == Direction.RIGHT && prev_dir == Direction.LEFT) ||
-            (dir == Direction.LEFT && prev_dir == Direction.RIGHT) ||
-            (dir == Direction.UP && prev_dir == Direction.DOWN) ||
-            (dir == Direction.DOWN && prev_dir == Direction.UP) 
-        ){
-            //nic nie robimy, kierunek niedozwolony
-        }
-        else{
-            //kierunek dozwolony, idziemy tam
-            prev_dir = dir;
-        }
+        //AI snake nie zrobi ruchu wbrew poprzedniemu kierunkowi
+        
         //jeśli zjedliśmy owocek, +1
         if(status == 1){
             addPart(1);
@@ -117,7 +106,5 @@ public class PlayerSnake implements Snake{
             return bodyColor;
         }
     }
-
-    
     
 }

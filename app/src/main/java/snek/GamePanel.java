@@ -64,29 +64,41 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
             }
             g.fillRect(16+x*16, 16*y+16, 15, 15);
         }
-        if(g_Controller.getBoard().getSnakeStatus(0)){
-            g.setColor(Color.WHITE);
-            g.drawString("Press \"p\" to play again", 20, 40);
-            g.drawString("Score: " + g_Controller.getBoard().getSnakeSize(0), 20,80);
-            g.setColor(Color.RED);
-            if(pauza && g_Controller.getState() != GameState.END){
-                g_Controller.setState(GameState.END);
-            }
+        
+        int snakeNum = 0;
+        if(g_Controller.getState() == GameState.ONE_PLAYER){
+            snakeNum = 1;
         }
-        else{
-            g.setColor(Color.cyan);
+        else if(g_Controller.getState() == GameState.TWO_PLAYER){
+            snakeNum = 2;
+        }
+        else if(g_Controller.getState() == GameState.THREE_PLAYER){
+            snakeNum = 3;
         }
         
-        for(int i = 0; i<g_Controller.getBoard().getSnakeSize(0); i++){
-            int x = g_Controller.getBoard().getSnakePart(i).getX();
-            int y = g_Controller.getBoard().getSnakePart(i).getY();
-            g.fillRect(16+x*16, 16*y+16, 15, 15);
-            g.setColor(Color.PINK);
+        for(int s = 0; s<snakeNum; s++){
+            g.setColor(g_Controller.getBoard().getSnakeColor(s, true));
+            for(int i = 0; i<g_Controller.getBoard().getSnakeSize(s); i++){
+                int x = g_Controller.getBoard().getSnakePart(i, s).getX();
+                int y = g_Controller.getBoard().getSnakePart(i, s).getY();
+                g.fillRect(16+x*16, 16*y+16, 15, 15);
+                g.setColor(g_Controller.getBoard().getSnakeColor(s, false));
+            }
         }
+        
 
         if(pauza && !g_Controller.getBoard().getSnakeStatus(0)){
             g.setColor(Color.magenta);
             g.fillRect(16+16, 16+16, 30, 30);
+        }
+
+        if(g_Controller.getBoard().getSnakeStatus(0)){
+            g.setColor(Color.WHITE);
+            g.drawString("Press \"p\" to play again", 20, 40);
+            g.drawString("Score: " + g_Controller.getBoard().getSnakeSize(0), 20,80);
+            if(pauza && g_Controller.getState() != GameState.END){
+                g_Controller.setState(GameState.END);
+            }
         }
 
         g.dispose();
