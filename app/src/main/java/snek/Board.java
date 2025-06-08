@@ -14,6 +14,8 @@ public class Board {
     private AISnake snek2;
     private AISnake snek3;
     private Direction prev_dir;
+    private Direction new_dir;
+    private Thread[] t;
 
     private int isTaken(int x, int y){
         for(Item i:  items){
@@ -183,6 +185,29 @@ public class Board {
         generateSnek(0);
         snek2 = null;
         snek3 = null;
+        new_dir = Direction.RIGHT;
+        t = new Thread[3];
+        t[0] = new Thread(){
+            @Override
+            public void run() {
+                updatePlayerSnake(new_dir);
+            }
+        };
+        t[1] = new Thread(){
+            @Override
+            public void run() {
+                updateAISnake(1);
+            }
+        };
+        t[2] = new Thread(){
+            @Override
+            public void run() {
+                updateAISnake(2);
+            }
+        };
+        for(int i = 0; i<3; i++){
+            t[i].start();
+        }
         if(s == 0){
             return;
         }
@@ -315,21 +340,21 @@ public class Board {
         return curr;
     }
 
-    public Direction findAIMove(int s){
+    private Direction findAIMove(int s){
         int currx=0;
         int curry=0;
         int closest = 0;
         Direction dir;
-        Direction prev_dir = Direction.RIGHT;
+        Direction prev = Direction.RIGHT;
         if(s==1){
             currx = snek2.getSnakePart(0).getX();
             curry = snek2.getSnakePart(0).getY();
-            prev_dir = snek2.getPrev();
+            prev = snek2.getPrev();
         }
         else if(s==2){
             currx = snek3.getSnakePart(0).getX();
             curry = snek3.getSnakePart(0).getY();
-            prev_dir = snek3.getPrev();
+            prev = snek3.getPrev();
         }
         closest = findClosest(currx, curry);
         int distance = Math.abs(currx-getItem(closest).getX());
@@ -337,7 +362,7 @@ public class Board {
         
         //sprawdzamy 4 przypadki:
         //W PRAWO, ale tylko, jeśli nie szedł wcześniej w lewo:
-        if(prev_dir != Direction.LEFT){
+        if(prev != Direction.LEFT){
             dir = Direction.RIGHT;
             //jest tam owocek
             if(isTaken(currx + dir.getX(), curry + dir.getY()) == 1){
@@ -353,7 +378,7 @@ public class Board {
             }
         }
         //W DÓŁ, ale tylko, jeśli nie szliśmy wcześniej w górę
-        if(prev_dir != Direction.UP){
+        if(prev != Direction.UP){
             dir = Direction.DOWN;
             //owocek
             if(isTaken(currx + dir.getX(), curry + dir.getY()) == 1){
@@ -369,7 +394,7 @@ public class Board {
             }
         }
         //W LEWO, ale tylko, jeśli nie szliśmy wcześniej w prawo
-        if(prev_dir != Direction.RIGHT){
+        if(prev != Direction.RIGHT){
             dir = Direction.LEFT;
             //owocek
             if(isTaken(currx + dir.getX(), curry + dir.getY()) == 1){
@@ -385,7 +410,7 @@ public class Board {
             }
         }
         //W GÓRĘ, ale tylko, jeśli wcześniej nie szliśmy w dół:
-        if(prev_dir != Direction.DOWN){
+        if(prev != Direction.DOWN){
             dir = Direction.UP;
             //owocek
             if(isTaken(currx + dir.getX(), curry + dir.getY()) == 1){
@@ -398,16 +423,26 @@ public class Board {
         }
         
         //ruchy neutralne, nie zbliżające nas do owocka, ale nie mordujące nas
-        if(isTaken(currx + Direction.RIGHT.getX(), curry + Direction.RIGHT.getY()) == 0 && prev_dir != Direction.LEFT){
+        if(isTaken(currx + Direction.RIGHT.getX(), curry + Direction.RIGHT.getY()) == 0 && prev != Direction.LEFT){
             return Direction.RIGHT;
         }
-        else if(isTaken(currx + Direction.DOWN.getX(), curry + Direction.DOWN.getY()) == 0 && prev_dir != Direction.UP){
+        else if(isTaken(currx + Direction.DOWN.getX(), curry + Direction.DOWN.getY()) == 0 && prev != Direction.UP){
             return Direction.DOWN;
         }
-        else if(isTaken(currx + Direction.LEFT.getX(), curry + Direction.LEFT.getY()) == 0 && prev_dir != Direction.RIGHT){
+        else if(isTaken(currx + Direction.LEFT.getX(), curry + Direction.LEFT.getY()) == 0 && prev != Direction.RIGHT){
             return Direction.LEFT;
         }
         //i tak zginiemy, domyślnie w ten sam kierunek, co wcześniej
-        return prev_dir;
+        return prev;
+    }
+
+    public void go(Direction dir){
+        //do sneka gracza
+
+        //TODO: dodać komunikację w sprawie wypadków głowa-głowa i głowa-ogon
+        new_dir = dir;
+        for(int i = 0; i<3; i++){
+            t[i].run();
+        }
     }
 }

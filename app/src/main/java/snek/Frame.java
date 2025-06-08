@@ -26,6 +26,7 @@ public class Frame extends JFrame implements Runnable{
     private boolean hasChanged;
     private List<Integer> highScores;
     private String f;
+    private int multiplier;
 
     public Frame(){
         f = "snek_scores.txt";
@@ -48,6 +49,7 @@ public class Frame extends JFrame implements Runnable{
         //zapisywanie do highscores
         readFromFile(f);
         mPanel.displayScores(highScores);
+        multiplier = 1;
     }
 
     @Override
@@ -63,6 +65,7 @@ public class Frame extends JFrame implements Runnable{
                 this.getContentPane().add(gPanel);
                 if(hasChanged) {
                     g_Controller.getBoard().reset(0);
+                    multiplier = 1;
                     panelChanged = true;
                 }
 
@@ -73,6 +76,7 @@ public class Frame extends JFrame implements Runnable{
                 this.getContentPane().add(gPanel);
                 if(hasChanged) {
                     g_Controller.getBoard().reset(1);
+                    multiplier = 2;
                     panelChanged = true;
                 }
                 //System.out.println(g_Controller.getState());
@@ -82,6 +86,7 @@ public class Frame extends JFrame implements Runnable{
                 this.getContentPane().add(gPanel);
                 if(hasChanged) {
                     g_Controller.getBoard().reset(2);
+                    multiplier = 3;
                     panelChanged = true;
                 }
                 //System.out.println(g_Controller.getState());
@@ -99,15 +104,15 @@ public class Frame extends JFrame implements Runnable{
                 if(g_Controller.getState() == GameState.END){
                     this.getContentPane().removeAll();
                     this.getContentPane().add(mPanel);
-                    highScores.add(g_Controller.getBoard().getSnakeSize(0));
+                    highScores.add(g_Controller.getBoard().getSnakeSize(0) * multiplier);
                     g_Controller.getBoard().reset(0);
                     if(this.mPanel != null){
-                    saveScores(f);
-                    mPanel.displayScores(highScores);
-                    g_Controller.setState(GameState.BEGGINING);
-                    //zapisywanie do pliku
+                        saveScores(f);
+                        mPanel.displayScores(highScores);
+                        g_Controller.setState(GameState.BEGGINING);
+                        //zapisywanie do pliku
                     
-                }
+                    }
                     panelChanged = true;
                 }
                 update();

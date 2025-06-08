@@ -60,7 +60,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
                 g.setColor(Color.LIGHT_GRAY);
             }
             else{
-                g.setColor(Color.RED);
+                g.setColor(Color.GREEN);
             }
             g.fillRect(16+x*16, 16*y+16, 15, 15);
         }
@@ -132,9 +132,10 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
                 //listen subThreads
                 //dodatkowy while - czeka na kolejne przejśćie
                 if(!g_Controller.getBoard().getSnakeStatus(0) && !pauza){
-                g_Controller.getBoard().updatePlayerSnake(dir);
-                g_Controller.getBoard().updateAISnake(1);
-                g_Controller.getBoard().updateAISnake(2);
+                // g_Controller.getBoard().updatePlayerSnake(dir);
+                // g_Controller.getBoard().updateAISnake(1);
+                // g_Controller.getBoard().updateAISnake(2);
+                g_Controller.getBoard().go(dir);
                 something_changed = true;
             }
                 update();
