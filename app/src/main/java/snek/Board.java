@@ -57,32 +57,54 @@ public class Board {
 
     private int snakeGo(Direction dir, int s){
         int result = 0;
-        if(
-            (dir == Direction.RIGHT && prev_dir == Direction.LEFT) ||
-            (dir == Direction.LEFT && prev_dir == Direction.RIGHT) ||
-            (dir == Direction.UP && prev_dir == Direction.DOWN) ||
-            (dir == Direction.DOWN && prev_dir == Direction.UP) 
-        ){
-            //nic nie robimy, kierunek niedozwolony
-        }
-        else{
-            prev_dir = dir;
-        }
+        
         if(s == 0){
+            if(
+                (dir == Direction.RIGHT && prev_dir == Direction.LEFT) ||
+                (dir == Direction.LEFT && prev_dir == Direction.RIGHT) ||
+                (dir == Direction.UP && prev_dir == Direction.DOWN) ||
+                (dir == Direction.DOWN && prev_dir == Direction.UP) 
+            ){
+                //nic nie robimy, kierunek niedozwolony
+            }
+            else{
+                prev_dir = dir;
+            }
             //snake gracza
             //znajdź nowe koordynaty sneka
             int newx = snek1.getSnakePart(0).getX() + prev_dir.getX();
             int newy = snek1.getSnakePart(0).getY() + prev_dir.getY();
             //sprawdź, co na nich jest, i zwróć to
             result= isTaken(newx, newy);
+            
         }
-        else{
-            //TODO: dodać case'y do pozostałych sneków
-            return 0;
+        else if(s == 1){
+            //te sneki są mądre, nie muszą się martwić prev_dir
+            int newx = snek2.getSnakePart(0).getX() + dir.getX();
+            int newy = snek2.getSnakePart(0).getY() + dir.getY();
+
+            result = isTaken(newx, newy);
+        }
+        else if(s==2){
+            //te sneki są mądre, nie muszą się martwić prev_dir
+            int newx = snek3.getSnakePart(0).getX() + dir.getX();
+            int newy = snek3.getSnakePart(0).getY() + dir.getY();
+
+            result = isTaken(newx, newy);
         }
         //jeśli zjedliśmy owoc, dodaj nowy owoc
         if(result == 1){
-            int fruit = findFruitByPosition(snek1.getSnakePart(0).getX() + prev_dir.getX(), snek1.getSnakePart(0).getY() + prev_dir.getY());
+            int fruit = 0;
+            if(s==0){
+                fruit = findFruitByPosition(snek1.getSnakePart(0).getX() + prev_dir.getX(), snek1.getSnakePart(0).getY() + prev_dir.getY());
+            }
+            else if(s==1){
+                fruit = findFruitByPosition(snek2.getSnakePart(0).getX() + dir.getX(), snek2.getSnakePart(0).getY() + dir.getY());
+            }
+            else if(s==2){
+                fruit = findFruitByPosition(snek3.getSnakePart(0).getX() + dir.getX(), snek3.getSnakePart(0).getY() + dir.getY());
+            }
+            
             boolean found = false;
             while(!found){
                 if(fruit == -1){
@@ -96,8 +118,7 @@ public class Board {
                     //znaleźliśmy dla niego miejsce, wsadzamy go tam
                     found = true;
                     items.get(fruit).setPosition(randomX, randomY);
-            }
-
+                }
             }
         }
         return result;
@@ -264,5 +285,129 @@ public class Board {
         else{
             return Color.blue;
         }
+    }
+
+    public void updateAISnake(int s){
+        if(s == 1 && snek2!=null){
+            Direction dir = findAIMove(s);
+            int next = snakeGo(dir, s);
+            snek2.move(dir, next);
+        }
+        if(s == 2 && snek3!=null){
+            Direction dir = findAIMove(s);
+            int next = snakeGo(dir, s);
+            snek3.move(dir, next);
+        }
+    }
+
+    //znajduje najbliższy owocek
+    private int findClosest(int x, int y){
+        int distance = 10000;
+        int curr=-1;
+        for(int i = 10; i<15; i++){
+            int tmp = Math.abs(x-getItem(i).getX());
+            tmp += Math.abs(y-getItem(i).getY());
+            if(distance>tmp){
+                distance = tmp;
+                curr = i;
+            }
+        }
+        return curr;
+    }
+
+    public Direction findAIMove(int s){
+        int currx=0;
+        int curry=0;
+        int closest = 0;
+        Direction dir;
+        Direction prev_dir = Direction.RIGHT;
+        if(s==1){
+            currx = snek2.getSnakePart(0).getX();
+            curry = snek2.getSnakePart(0).getY();
+            prev_dir = snek2.getPrev();
+        }
+        else if(s==2){
+            currx = snek3.getSnakePart(0).getX();
+            curry = snek3.getSnakePart(0).getY();
+            prev_dir = snek3.getPrev();
+        }
+        closest = findClosest(currx, curry);
+        int distance = Math.abs(currx-getItem(closest).getX());
+        distance += Math.abs(curry-getItem(closest).getY());
+        
+        //sprawdzamy 4 przypadki:
+        //W PRAWO, ale tylko, jeśli nie szedł wcześniej w lewo:
+        if(prev_dir != Direction.LEFT){
+            dir = Direction.RIGHT;
+            //jest tam owocek
+            if(isTaken(currx + dir.getX(), curry + dir.getY()) == 1){
+                return dir;
+            }
+            //zbliżamy się do owocka
+            else if(isTaken(currx + dir.getX(), curry + dir.getY()) == 0){
+                int tmp = Math.abs(currx+dir.getX()-getItem(closest).getX());
+                tmp += Math.abs(curry + dir.getY()-getItem(closest).getY());
+                if(distance>tmp){
+                    return dir;
+                }
+            }
+        }
+        //W DÓŁ, ale tylko, jeśli nie szliśmy wcześniej w górę
+        if(prev_dir != Direction.UP){
+            dir = Direction.DOWN;
+            //owocek
+            if(isTaken(currx + dir.getX(), curry + dir.getY()) == 1){
+                return dir;
+            }
+            //bliżej owocka
+            else if(isTaken(currx + dir.getX(), curry + dir.getY()) == 0){
+                int tmp = Math.abs(currx+dir.getX()-getItem(closest).getX());
+                tmp += Math.abs(curry + dir.getY()-getItem(closest).getY());
+                if(distance>tmp){
+                    return dir;
+                }
+            }
+        }
+        //W LEWO, ale tylko, jeśli nie szliśmy wcześniej w prawo
+        if(prev_dir != Direction.RIGHT){
+            dir = Direction.LEFT;
+            //owocek
+            if(isTaken(currx + dir.getX(), curry + dir.getY()) == 1){
+                return dir;
+            }
+            //zbliżamy się do owocka
+            else if(isTaken(currx + dir.getX(), curry + dir.getY()) == 0){
+                int tmp = Math.abs(currx+dir.getX()-getItem(closest).getX());
+                tmp += Math.abs(curry + dir.getY()-getItem(closest).getY());
+                if(distance>tmp){
+                    return dir;
+                }
+            }
+        }
+        //W GÓRĘ, ale tylko, jeśli wcześniej nie szliśmy w dół:
+        if(prev_dir != Direction.DOWN){
+            dir = Direction.UP;
+            //owocek
+            if(isTaken(currx + dir.getX(), curry + dir.getY()) == 1){
+                return dir;
+            }
+            //bliżej owocka lub nie zabije nas to
+            else if(isTaken(currx + dir.getX(), curry + dir.getY()) == 0){
+                return dir;
+            }
+        }
+        
+        //ruchy neutralne, nie zbliżające nas do owocka, ale nie mordujące nas
+        if(isTaken(currx + Direction.RIGHT.getX(), curry + Direction.RIGHT.getY()) == 0 && prev_dir != Direction.LEFT){
+            return Direction.RIGHT;
+        }
+        else if(isTaken(currx + Direction.DOWN.getX(), curry + Direction.DOWN.getY()) == 0 && prev_dir != Direction.UP){
+            return Direction.DOWN;
+        }
+        else if(isTaken(currx + Direction.LEFT.getX(), curry + Direction.LEFT.getY()) == 0 && prev_dir != Direction.RIGHT){
+            return Direction.LEFT;
+        }
+        //i tak zginiemy, domyślnie w ten sam kierunek, co wcześniej
+        return prev_dir;
     }
 }

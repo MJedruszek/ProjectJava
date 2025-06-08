@@ -133,6 +133,8 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
                 //dodatkowy while - czeka na kolejne przejśćie
                 if(!g_Controller.getBoard().getSnakeStatus(0) && !pauza){
                 g_Controller.getBoard().updatePlayerSnake(dir);
+                g_Controller.getBoard().updateAISnake(1);
+                g_Controller.getBoard().updateAISnake(2);
                 something_changed = true;
             }
                 update();

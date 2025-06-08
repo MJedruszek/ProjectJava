@@ -61,6 +61,7 @@ public class AISnake implements Snake{
 
         //jeśli nie umarliśmy, próbujemy się przesunąć w kierunku dir
         //AI snake nie zrobi ruchu wbrew poprzedniemu kierunkowi
+        prev_dir = dir;
         
         //jeśli zjedliśmy owocek, +1
         if(status == 1){
@@ -105,6 +106,12 @@ public class AISnake implements Snake{
         else{
             return bodyColor;
         }
+    }
+
+
+    //do sterowania w boardzie
+    public Direction getPrev(){
+        return prev_dir;
     }
     
 }
