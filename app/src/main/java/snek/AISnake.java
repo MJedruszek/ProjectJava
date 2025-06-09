@@ -67,6 +67,9 @@ public class AISnake implements Snake{
         if(status == 1){
             addPart(1);
         }
+        if(status == 3){
+            addPart(3);
+        }
         //idziemy 1 do przodu
         update(prev_dir);
     }

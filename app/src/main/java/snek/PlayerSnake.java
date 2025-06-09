@@ -23,8 +23,12 @@ public class PlayerSnake implements Snake{
     @Override
     public void movePart(int pos) {
         if(pos == 0) return;
-        snek.get(pos).setX(snek.get(pos-1).getX());
-        snek.get(pos).setY(snek.get(pos-1).getY());
+        //jeśli dodaliśmy trzy (po zjedzeniu żaby), to ostantnie kawałki, o umiejscowieniu takim, jak kolejny, zostają
+        //if(snek.get(pos).getX() != snek.get(pos-1).getX() || snek.get(pos).getY() != snek.get(pos-1).getY()){
+            snek.get(pos).setX(snek.get(pos-1).getX());
+            snek.get(pos).setY(snek.get(pos-1).getY());
+        //}
+        
     }
 
     @Override
@@ -76,6 +80,9 @@ public class PlayerSnake implements Snake{
         //jeśli zjedliśmy owocek, +1
         if(status == 1){
             addPart(1);
+        }
+        if(status == 3){
+            addPart(3);
         }
         //idziemy 1 do przodu
         update(prev_dir);

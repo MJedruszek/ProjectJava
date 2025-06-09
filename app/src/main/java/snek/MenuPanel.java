@@ -100,9 +100,11 @@ public class MenuPanel extends JPanel implements ActionListener{
 
     public void displayScores(List<Integer> l){
         String s = new String();
+        int size = l.size();
+        if(size>10) size = 10;
         s = "<html>High scores: <br>";
         if(!l.isEmpty()){
-            for(int i = 0; i<l.size(); i++){
+            for(int i = 0; i<size; i++){
                 s = s + "<br>";
                 s = s + l.get(i).toString();
             }

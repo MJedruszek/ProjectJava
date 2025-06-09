@@ -16,6 +16,7 @@ public class Board {
     private Direction prev_dir;
     private Direction new_dir;
     private Thread[] t;
+    private Frog forg;
 
     private int isTaken(int x, int y){
         for(Item i:  items){
@@ -44,7 +45,9 @@ public class Board {
         if(x>width-1 || x<0 || y>height-1 || y<0){
             return 2;
         }
-        //TODO: frog do dodania, zwróci 3
+        if(forg != null && x == forg.getX() && y == forg.getY()){
+            return 3;
+        }
         return 0;
     }
 
@@ -123,6 +126,7 @@ public class Board {
                 }
             }
         }
+        if(result == 3) forg.setStatus(true); //żaba umarła
         return result;
     }
 
@@ -176,6 +180,19 @@ public class Board {
         }
     }
 
+    private void generateFrog(){
+        boolean found = false;
+        while(!found){
+            Random rand = new Random();
+            int randomX = rand.nextInt((width));
+            int randomY = rand.nextInt((height));
+            if(isTaken(randomX, randomY) == 0){
+                found = true;
+                forg = new Frog(randomX, randomY);
+            }
+        }
+    }
+
     public Board(int width, int height, int s){
         items = new ArrayList<>();
         this.width = width;
@@ -185,8 +202,9 @@ public class Board {
         generateSnek(0);
         snek2 = null;
         snek3 = null;
+        generateFrog();
         new_dir = Direction.RIGHT;
-        t = new Thread[3];
+        t = new Thread[4];
         t[0] = new Thread(){
             @Override
             public void run() {
@@ -205,7 +223,13 @@ public class Board {
                 updateAISnake(2);
             }
         };
-        for(int i = 0; i<3; i++){
+        t[3] = new Thread(){
+            @Override
+            public void run(){
+                updateFrog();
+            }
+        };
+        for(int i = 0; i<4; i++){
             t[i].start();
         }
         if(s == 0){
@@ -436,12 +460,166 @@ public class Board {
         return prev;
     }
 
+    private Direction checkBest(int dist, int closest){
+        int tmp = 0;
+        if(closest == 0){
+            if(isTaken(forg.getX() + Direction.RIGHT.getX(), forg.getY() + Direction.RIGHT.getY()) == 0){
+                tmp = Math.abs(snek1.getSnakePart(0).getX()-forg.getX() + Direction.RIGHT.getX());
+                tmp += Math.abs(snek1.getSnakePart(0).getY() - forg.getY() + Direction.RIGHT.getY());
+                if(tmp<dist) return Direction.RIGHT;
+            }
+            if(isTaken(forg.getX() + Direction.DOWN.getX(), forg.getY() + Direction.DOWN.getY()) == 0){
+                tmp = Math.abs(snek1.getSnakePart(0).getX()-forg.getX() + Direction.DOWN.getX());
+                tmp += Math.abs(snek1.getSnakePart(0).getY() - forg.getY() + Direction.DOWN.getY());
+                if(tmp<dist) return Direction.DOWN;
+            }
+            if(isTaken(forg.getX() + Direction.LEFT.getX(), forg.getY() + Direction.LEFT.getY()) == 0){
+                tmp = Math.abs(snek1.getSnakePart(0).getX()-forg.getX() + Direction.LEFT.getX());
+                tmp += Math.abs(snek1.getSnakePart(0).getY() - forg.getY() + Direction.LEFT.getY());
+                if(tmp<dist) return Direction.LEFT;
+            }
+            if(isTaken(forg.getX() + Direction.UP.getX(), forg.getY() + Direction.UP.getY()) == 0){
+                return Direction.UP;
+            }
+            else if (isTaken(forg.getX() + Direction.RIGHT.getX(), forg.getY() + Direction.RIGHT.getY()) == 0){
+                return Direction.RIGHT;
+            }
+            else if(isTaken(forg.getX() + Direction.DOWN.getX(), forg.getY() + Direction.DOWN.getY()) == 0){
+                return Direction.DOWN;
+            }
+            else if(isTaken(forg.getX() + Direction.LEFT.getX(), forg.getY() + Direction.LEFT.getY()) == 0){
+                return Direction.LEFT;
+            }
+            //żaba otoczona z czterech stron obiektami, i tak umrze, zmieniamy status i umieramy
+            else{
+                forg.setStatus(true);
+                return Direction.RIGHT;
+            }
+        }
+        else if(closest == 1){
+            if(isTaken(forg.getX() + Direction.RIGHT.getX(), forg.getY() + Direction.RIGHT.getY()) == 0){
+                tmp = Math.abs(snek2.getSnakePart(0).getX()-forg.getX() + Direction.RIGHT.getX());
+                tmp += Math.abs(snek2.getSnakePart(0).getY() - forg.getY() + Direction.RIGHT.getY());
+                if(tmp<dist) return Direction.RIGHT;
+            }
+            if(isTaken(forg.getX() + Direction.DOWN.getX(), forg.getY() + Direction.DOWN.getY()) == 0){
+                tmp = Math.abs(snek2.getSnakePart(0).getX()-forg.getX() + Direction.DOWN.getX());
+                tmp += Math.abs(snek2.getSnakePart(0).getY() - forg.getY() + Direction.DOWN.getY());
+                if(tmp<dist) return Direction.DOWN;
+            }
+            if(isTaken(forg.getX() + Direction.LEFT.getX(), forg.getY() + Direction.LEFT.getY()) == 0){
+                tmp = Math.abs(snek2.getSnakePart(0).getX()-forg.getX() + Direction.LEFT.getX());
+                tmp += Math.abs(snek2.getSnakePart(0).getY() - forg.getY() + Direction.LEFT.getY());
+                if(tmp<dist) return Direction.LEFT;
+            }
+            if(isTaken(forg.getX() + Direction.UP.getX(), forg.getY() + Direction.UP.getY()) == 0){
+                return Direction.UP;
+            }
+            else if (isTaken(forg.getX() + Direction.RIGHT.getX(), forg.getY() + Direction.RIGHT.getY()) == 0){
+                return Direction.RIGHT;
+            }
+            else if(isTaken(forg.getX() + Direction.DOWN.getX(), forg.getY() + Direction.DOWN.getY()) == 0){
+                return Direction.DOWN;
+            }
+            else if(isTaken(forg.getX() + Direction.LEFT.getX(), forg.getY() + Direction.LEFT.getY()) == 0){
+                return Direction.LEFT;
+            }
+            //żaba otoczona z czterech stron obiektami, i tak umrze, zmieniamy status i umieramy
+            else{
+                forg.setStatus(true);
+                return Direction.RIGHT;
+            }
+        }
+        else{
+            if(isTaken(forg.getX() + Direction.RIGHT.getX(), forg.getY() + Direction.RIGHT.getY()) == 0){
+                tmp = Math.abs(snek3.getSnakePart(0).getX()-forg.getX() + Direction.RIGHT.getX());
+                tmp += Math.abs(snek3.getSnakePart(0).getY() - forg.getY() + Direction.RIGHT.getY());
+                if(tmp<dist) return Direction.RIGHT;
+            }
+            if(isTaken(forg.getX() + Direction.DOWN.getX(), forg.getY() + Direction.DOWN.getY()) == 0){
+                tmp = Math.abs(snek3.getSnakePart(0).getX()-forg.getX() + Direction.DOWN.getX());
+                tmp += Math.abs(snek3.getSnakePart(0).getY() - forg.getY() + Direction.DOWN.getY());
+                if(tmp<dist) return Direction.DOWN;
+            }
+            if(isTaken(forg.getX() + Direction.LEFT.getX(), forg.getY() + Direction.LEFT.getY()) == 0){
+                tmp = Math.abs(snek3.getSnakePart(0).getX()-forg.getX() + Direction.LEFT.getX());
+                tmp += Math.abs(snek3.getSnakePart(0).getY() - forg.getY() + Direction.LEFT.getY());
+                if(tmp<dist) return Direction.LEFT;
+            }
+            if(isTaken(forg.getX() + Direction.UP.getX(), forg.getY() + Direction.UP.getY()) == 0){
+                return Direction.UP;
+            }
+            else if (isTaken(forg.getX() + Direction.RIGHT.getX(), forg.getY() + Direction.RIGHT.getY()) == 0){
+                return Direction.RIGHT;
+            }
+            else if(isTaken(forg.getX() + Direction.DOWN.getX(), forg.getY() + Direction.DOWN.getY()) == 0){
+                return Direction.DOWN;
+            }
+            else if(isTaken(forg.getX() + Direction.LEFT.getX(), forg.getY() + Direction.LEFT.getY()) == 0){
+                return Direction.LEFT;
+            }
+            //żaba otoczona z czterech stron obiektami, i tak umrze, zmieniamy status i umieramy
+            else{
+                forg.setStatus(true);
+                return Direction.RIGHT;
+            }
+        }
+    }
+
+    private void updateFrog(){
+        //żaba została zjedzona
+        if(forg.getStatus()){
+            generateFrog();
+            return;
+        }
+        int distance = 1000;
+        int tmp = 0;
+        int closest = 0;
+        //szukamy najbliższego sneka
+        tmp = Math.abs(snek1.getSnakePart(0).getX()-forg.getX());
+        tmp += Math.abs(snek1.getSnakePart(0).getY() - forg.getY());
+        if(distance>tmp) {
+            distance = tmp;
+            closest = 0;
+        }
+
+        if(snek2 != null){
+            tmp = Math.abs(snek2.getSnakePart(0).getX()-forg.getX());
+            tmp += Math.abs(snek2.getSnakePart(0).getY() - forg.getY());
+        }
+        if(distance>tmp) {
+            distance = tmp;
+            closest = 1;
+        }
+        if(snek3!=null){
+            tmp = Math.abs(snek3.getSnakePart(0).getX()-forg.getX());
+            tmp += Math.abs(snek3.getSnakePart(0).getY() - forg.getY());
+        }
+        if(distance>tmp) {
+            distance = tmp;
+            closest = 2;
+        }
+
+        Direction dir = checkBest(distance, closest);
+        if(!forg.getStatus()){
+            forg.setX(forg.getX()+dir.getX());
+            forg.setY(forg.getY()+dir.getY());
+        }
+        
+
+    }
+
+    public Frog getFrog(){
+        return forg;
+    }
+
+
     public void go(Direction dir){
         //do sneka gracza
 
         //TODO: dodać komunikację w sprawie wypadków głowa-głowa i głowa-ogon
         new_dir = dir;
-        for(int i = 0; i<3; i++){
+        for(int i = 0; i<4; i++){
             t[i].run();
         }
     }
