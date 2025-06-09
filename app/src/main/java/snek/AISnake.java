@@ -116,5 +116,10 @@ public class AISnake implements Snake{
     public Direction getPrev(){
         return prev_dir;
     }
+
+    @Override
+    public void setStatus(boolean dead) {
+        is_ded = dead;
+    }
     
 }

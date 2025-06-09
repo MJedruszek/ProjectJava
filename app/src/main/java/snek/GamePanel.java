@@ -14,7 +14,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
     private int width;
     private int height;   
     private Thread gameThread = new Thread(this); //implementuje runnable
-    private int FPS = 8;
+    private int FPS = 6;
     private boolean something_changed;
     private boolean pauza;
     private Direction dir;

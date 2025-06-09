@@ -37,4 +37,6 @@ public interface Snake {
     abstract boolean getState();
 
     abstract Color getColor(boolean head);
+
+    abstract void setStatus(boolean dead);
 }

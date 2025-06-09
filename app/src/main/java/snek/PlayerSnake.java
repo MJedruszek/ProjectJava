@@ -125,6 +125,11 @@ public class PlayerSnake implements Snake{
         }
     }
 
+    @Override
+    public void setStatus(boolean dead) {
+        is_ded = dead;
+    }
+
     
     
 }
