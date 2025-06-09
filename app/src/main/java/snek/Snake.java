@@ -38,5 +38,5 @@ public interface Snake {
 
     abstract Color getColor(boolean head);
 
-    abstract void setStatus(boolean dead);
+    // abstract void setStatus(boolean dead);
 }

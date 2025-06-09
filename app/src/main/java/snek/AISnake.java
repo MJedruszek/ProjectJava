@@ -36,13 +36,12 @@ public class AISnake implements Snake{
 
     @Override
     public boolean checkIfHit(int x, int y) {
-        boolean hit = false;
         for(int i = 0; i < snek.size(); i++){
             if(snek.get(i).getX() == x && snek.get(i).getY() == y){
-                hit = true;
+                return true;
             }
         }
-        return hit;
+        return false;
     }
 
 
@@ -117,9 +116,9 @@ public class AISnake implements Snake{
         return prev_dir;
     }
 
-    @Override
-    public void setStatus(boolean dead) {
-        is_ded = dead;
-    }
+    // @Override
+    // public void setStatus(boolean dead) {
+    //     is_ded = dead;
+    // }
     
 }

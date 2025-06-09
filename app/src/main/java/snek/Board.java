@@ -1,7 +1,7 @@
 package snek;
 
 import java.awt.Color;
-import java.awt.Point;
+// import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -20,8 +20,8 @@ public class Board {
     private Direction new_dir;
     private Thread[] t;
     private Frog forg;
-    private Point[] next_positions;
-    private Point[] past_tail_positions;
+    // private Point[] next_positions;
+    // private Point[] past_tail_positions;
     private CyclicBarrier barrier;
     private CyclicBarrier finished_barrier;
     private boolean shouldWork;
@@ -215,14 +215,14 @@ public class Board {
         snek2 = null;
         snek3 = null;
         generateFrog();
-        next_positions = new Point[3];
-        for(int j = 0; j<3; j++){
-            next_positions[j] = new Point(-2,-2);
-        }
-        past_tail_positions = new Point[3];
-        for(int j = 0; j<3; j++){
-            past_tail_positions[j] = new Point(-2,-2);
-        }
+        // next_positions = new Point[3];
+        // for(int j = 0; j<3; j++){
+        //     next_positions[j] = new Point(-2,-2);
+        // }
+        // past_tail_positions = new Point[3];
+        // for(int j = 0; j<3; j++){
+        //     past_tail_positions[j] = new Point(-2,-2);
+        // }
         new_dir = Direction.RIGHT;
         t = new Thread[4];
         t[0] = new Thread(){
@@ -238,7 +238,6 @@ public class Board {
                     try {
                         finishMove();
                     } catch (Exception e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                 }
@@ -257,7 +256,6 @@ public class Board {
                     try {
                         finishMove();
                     } catch (Exception e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                 }
@@ -276,7 +274,6 @@ public class Board {
                     try {
                         finishMove();
                     } catch (Exception e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                 }
@@ -368,25 +365,25 @@ public class Board {
 
     public void updatePlayerSnake(Direction dir){
         int next = snakeGo(dir, 0); //sprawdzamy dla sneka gracza
-        if(!snek1.getState()) {
-            next_positions[0] = new Point(
-                snek1.getSnakePart(0).getX() + dir.getX(),
-                snek1.getSnakePart(0).getY() + dir.getY()
-            );
-            //jedyna sytuacja, kiedy ogon ucieknie: nic tam nie ma, w pozostałych i tak snek umrze
-            //ogon to size-1
-            if(next == 0){
-                past_tail_positions[0] = new Point(
-                    snek1.getSnakePart(getSnakeSize(0)-1).getX(),
-                    snek1.getSnakePart(getSnakeSize(0)-1).getY()
-                );
-            }
-        }
+        // if(!snek1.getState()) {
+        //     next_positions[0] = new Point(
+        //         snek1.getSnakePart(0).getX() + dir.getX(),
+        //         snek1.getSnakePart(0).getY() + dir.getY()
+        //     );
+        //     //jedyna sytuacja, kiedy ogon ucieknie: nic tam nie ma, w pozostałych i tak snek umrze
+        //     //ogon to size-1
+        //     if(next == 0){
+        //         past_tail_positions[0] = new Point(
+        //             snek1.getSnakePart(getSnakeSize(0)-1).getX(),
+        //             snek1.getSnakePart(getSnakeSize(0)-1).getY()
+        //         );
+        //     }
+        // }
         //snek jest martwy, już nigdzie nie pójdzie, umarł w poprzednim kroku
-        else {
-            next_positions[0] = new Point(-1,-1);
-            past_tail_positions[0] = new Point(-1, -1);
-        }
+        // else {
+        //     next_positions[0] = new Point(-1,-1);
+        //     past_tail_positions[0] = new Point(-1, -1);
+        // }
         //Czekamy, aż wszyscy tu przyjdą
         try {
             barrier.await();
@@ -395,36 +392,36 @@ public class Board {
         } catch (BrokenBarrierException e) {
             e.printStackTrace();
         }
-        boolean dont_die = false;
-        //miał wpaść na ogon sneka 1, nie zrobi tego
-        if(next_positions[0]==past_tail_positions[0]){
-            //miały się zderzyć głowa ogon, nie zrobią tego
-            printStuff();
-            dont_die = true;
-        }
-        else if(snek2!=null && next_positions[0]==past_tail_positions[1]){
-            //miały się zderzyć głowa ogon, nie zrobią tego
-            printStuff();
-            dont_die = true;
-        }
-        else if(snek3 != null && next_positions[0]==past_tail_positions[2]){
-            //miały się zderzyć głowa ogon, nie zrobią tego
-            printStuff();
-            dont_die = true;
-        }
+        // boolean dont_die = false;
+        // //miał wpaść na ogon sneka 1, nie zrobi tego
+        // if(next_positions[0]==past_tail_positions[0]){
+        //     //miały się zderzyć głowa ogon, nie zrobią tego
+        //     printStuff();
+        //     dont_die = true;
+        // }
+        // else if(snek2!=null && next_positions[0]==past_tail_positions[1]){
+        //     //miały się zderzyć głowa ogon, nie zrobią tego
+        //     printStuff();
+        //     dont_die = true;
+        // }
+        // else if(snek3 != null && next_positions[0]==past_tail_positions[2]){
+        //     //miały się zderzyć głowa ogon, nie zrobią tego
+        //     printStuff();
+        //     dont_die = true;
+        // }
         snek1.move(dir, next); //snek idzie
-        if(dont_die) snek1.setStatus(false);
+        // if(dont_die) snek1.setStatus(false);
     }
 
     public void reset(int i){
         prev_dir = Direction.RIGHT;
         //resetujemy też ten wektor
-        for(int j = 0; j<3; j++){
-            next_positions[j] = new Point(-2,-2);
-        }
-        for(int j = 0; j<3; j++){
-            past_tail_positions[j] = new Point(-2,-2);
-        }
+        // for(int j = 0; j<3; j++){
+        //     next_positions[j] = new Point(-2,-2);
+        // }
+        // for(int j = 0; j<3; j++){
+        //     past_tail_positions[j] = new Point(-2,-2);
+        // }
         barrier = new CyclicBarrier(3);
         generateAllItems();
         generateSnek(0);
@@ -461,25 +458,25 @@ public class Board {
         if(s == 1 && snek2!=null){
             Direction dir = findAIMove(s);
             int next = snakeGo(dir, s);
-            if(!snek2.getState()) {
-                next_positions[s] = new Point(
-                    snek2.getSnakePart(0).getX() + dir.getX(),
-                    snek2.getSnakePart(0).getY() + dir.getY()
-                );
-                //jedyna sytuacja, kiedy ogon ucieknie: nic tam nie ma, w pozostałych i tak snek umrze
-                //ogon jest na pozycji size-1
-                if(next == 0){
-                    past_tail_positions[1] = new Point(
-                        snek2.getSnakePart(getSnakeSize(1)-1).getX(),
-                        snek2.getSnakePart(getSnakeSize(1)-1).getY()
-                    );
-                }
-            }
-            //snek jest martwy, już nigdzie nie pójdzie, umarł w poprzednim kroku
-            else {
-                next_positions[s] = new Point(-1,-1);
-                past_tail_positions[s] = new Point(-1, -1);
-            }
+            // if(!snek2.getState()) {
+            //     next_positions[s] = new Point(
+            //         snek2.getSnakePart(0).getX() + dir.getX(),
+            //         snek2.getSnakePart(0).getY() + dir.getY()
+            //     );
+            //     //jedyna sytuacja, kiedy ogon ucieknie: nic tam nie ma, w pozostałych i tak snek umrze
+            //     //ogon jest na pozycji size-1
+            //     if(next == 0){
+            //         past_tail_positions[1] = new Point(
+            //             snek2.getSnakePart(snek2.getSnakeSize()-1).getX(),
+            //             snek2.getSnakePart(snek2.getSnakeSize()-1).getY()
+            //         );
+            //     }
+            // }
+            // //snek jest martwy, już nigdzie nie pójdzie, umarł w poprzednim kroku
+            // else {
+            //     next_positions[s] = new Point(-1,-1);
+            //     past_tail_positions[s] = new Point(-1, -1);
+            // }
             //1 przypadek: nie wszyscy żywi skończyli, czekamy
             try {
                 barrier.await();
@@ -488,24 +485,24 @@ public class Board {
             } catch (BrokenBarrierException e) {
                 e.printStackTrace();
             }
-            boolean dont_die = false;
-            if(next_positions[1]==past_tail_positions[0]){
-            //miały się zderzyć głowa ogon, nie zrobią tego
-                printStuff();
-                dont_die = true;
-            }
-            else if(next_positions[1]==past_tail_positions[1]){
-                //miały się zderzyć głowa ogon, nie zrobią tego
-                printStuff();
-                dont_die = true;
-            }
-            else if(snek3 != null && next_positions[1]==past_tail_positions[2]){
-                //miały się zderzyć głowa ogon, nie zrobią tego
-                printStuff();
-                dont_die = true;
-            }
+            // boolean dont_die = false;
+            // if(next_positions[1]==past_tail_positions[0]){
+            // //miały się zderzyć głowa ogon, nie zrobią tego
+            //     printStuff();
+            //     dont_die = true;
+            // }
+            // else if(next_positions[1]==past_tail_positions[1]){
+            //     //miały się zderzyć głowa ogon, nie zrobią tego
+            //     printStuff();
+            //     dont_die = true;
+            // }
+            // else if(snek3 != null && next_positions[1]==past_tail_positions[2]){
+            //     //miały się zderzyć głowa ogon, nie zrobią tego
+            //     printStuff();
+            //     dont_die = true;
+            // }
             snek2.move(dir, next);
-            if(dont_die) snek2.setStatus(false);
+            // if(dont_die) snek2.setStatus(false);
         }
         //snake nieaktywny
         else if(s == 1){
@@ -520,25 +517,25 @@ public class Board {
         if(s == 2 && snek3!=null){
             Direction dir = findAIMove(s);
             int next = snakeGo(dir, s);
-            if(!snek3.getState()) {
-                next_positions[s] = new Point(
-                    snek3.getSnakePart(0).getX() + dir.getX(),
-                    snek3.getSnakePart(0).getY() + dir.getY()
-                );
-                //jedyna sytuacja, kiedy ogon ucieknie: nic tam nie ma, w pozostałych i tak snek umrze
-                //ogon jest na pozycji size-1
-                if(next == 0){
-                    past_tail_positions[2] = new Point(
-                        snek3.getSnakePart(getSnakeSize(2)-1).getX(),
-                        snek3.getSnakePart(getSnakeSize(2)-1).getY()
-                    );
-                }
-            }
-            //snek jest martwy, już nigdzie nie pójdzie, umarł w poprzednim kroku
-            else {
-                next_positions[s] = new Point(-1,-1);
-                past_tail_positions[s] = new Point(-1, -1);
-            }
+            // if(!snek3.getState()) {
+            //     next_positions[s] = new Point(
+            //         snek3.getSnakePart(0).getX() + dir.getX(),
+            //         snek3.getSnakePart(0).getY() + dir.getY()
+            //     );
+            //     //jedyna sytuacja, kiedy ogon ucieknie: nic tam nie ma, w pozostałych i tak snek umrze
+            //     //ogon jest na pozycji size-1
+            //     if(next == 0){
+            //         past_tail_positions[2] = new Point(
+            //             snek3.getSnakePart(snek3.getSnakeSize()-1).getX(),
+            //             snek3.getSnakePart(snek3.getSnakeSize()-1).getY()
+            //         );
+            //     }
+            // }
+            // //snek jest martwy, już nigdzie nie pójdzie, umarł w poprzednim kroku
+            // else {
+            //     next_positions[s] = new Point(-1,-1);
+            //     past_tail_positions[s] = new Point(-1, -1);
+            // }
             //1 przypadek: nie wszyscy żywi skończyli, czekamy
             try {
                 barrier.await();
@@ -547,24 +544,24 @@ public class Board {
             } catch (BrokenBarrierException e) {
                 e.printStackTrace();
             }
-            boolean dont_die = false;
-            if(snek3 != null && next_positions[2]==past_tail_positions[0]){
-                //miały się zderzyć głowa ogon, nie zrobią tego
-                printStuff();
-                dont_die = true;
-            }
-            else if(snek3 != null && snek2 != null && next_positions[2]==past_tail_positions[1]){
-                //miały się zderzyć głowa ogon, nie zrobią tego
-                printStuff();
-                dont_die = true;
-            }
-            else if(snek3 != null && next_positions[2]==past_tail_positions[2]){
-                //miały się zderzyć głowa ogon, nie zrobią tego
-                printStuff();
-                dont_die = true;
-            }
+            // boolean dont_die = false;
+            // if(next_positions[2]==past_tail_positions[0]){
+            //     //miały się zderzyć głowa ogon, nie zrobią tego
+            //     printStuff();
+            //     dont_die = true;
+            // }
+            // else if(next_positions[2]==past_tail_positions[1]){
+            //     //miały się zderzyć głowa ogon, nie zrobią tego
+            //     printStuff();
+            //     dont_die = true;
+            // }
+            // else if(next_positions[2]==past_tail_positions[2]){
+            //     //miały się zderzyć głowa ogon, nie zrobią tego
+            //     printStuff();
+            //     dont_die = true;
+            // }
             snek3.move(dir, next);
-            if(dont_die) snek3.setStatus(false);
+            // if(dont_die) snek3.setStatus(false);
         }
         //snake nieaktywny
         else if(s == 2){
@@ -842,29 +839,29 @@ public class Board {
         return forg;
     }
 
-    private void checkHeadToHead(){
-        if(next_positions[0] == next_positions[1]){
-            //zaraz zderzą się głowami, pora je zabić
-            snek1.setStatus(true);
-            if(snek2!= null) snek2.setStatus(true);
-        }
-        if(next_positions[0] == next_positions[2]){
-            snek1.setStatus(true);
-            if(snek3!=null) snek3.setStatus(true);
-        }
-        if(next_positions[1] == next_positions[2]){
-            if(snek2!=null) snek2.setStatus(true);
-            if(snek3!=null) snek3.setStatus(true);
-        }
-    }
+    // private void checkHeadToHead(){
+    //     if(next_positions[0] == next_positions[1]){
+    //         //zaraz zderzą się głowami, pora je zabić
+    //         snek1.setStatus(true);
+    //         if(snek2!= null) snek2.setStatus(true);
+    //     }
+    //     if(next_positions[0] == next_positions[2]){
+    //         snek1.setStatus(true);
+    //         if(snek3!=null) snek3.setStatus(true);
+    //     }
+    //     if(next_positions[1] == next_positions[2]){
+    //         if(snek2!=null) snek2.setStatus(true);
+    //         if(snek3!=null) snek3.setStatus(true);
+    //     }
+    // }
 
-    private void printStuff(){
-        for (int i=0; i<3; i++) {
-            System.out.println("Snek " + i);
-            System.out.println("Head " + next_positions[i]);
-            System.out.println("Tail " + past_tail_positions[i]);
-        }
-    }
+    // private void printStuff(){
+    //     for (int i=0; i<3; i++) {
+    //         System.out.println("Snek " + i);
+    //         System.out.println("Head " + next_positions[i]);
+    //         System.out.println("Tail " + past_tail_positions[i]);
+    //     }
+    // }
 
 
     public void go(Direction dir){
@@ -881,14 +878,14 @@ public class Board {
 
         //po updatowaniu sprawdzamy, czy któryś nie umarł na darmo albo nie umarł a powinien
         //sprawdzamy, czy ktoś nie zderzył się głowami - dwie głowy mają to samo value
-        checkHeadToHead();
+        // checkHeadToHead();
         //sam koniec - resetujemy aktywne węże na -2, -2
-        for(int j = 0; j<3; j++){
-            next_positions[j] = new Point(-2,-2);
-        }
-        for(int j = 0; j<3; j++){
-            past_tail_positions[j] = new Point(-2,-2);
-        }
+        // for(int j = 0; j<3; j++){
+        //     next_positions[j] = new Point(-2,-2);
+        // }
+        // for(int j = 0; j<3; j++){
+        //     past_tail_positions[j] = new Point(-2,-2);
+        // }
     }
 
     public synchronized void waitForSignal() throws InterruptedException {
