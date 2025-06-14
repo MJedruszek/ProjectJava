@@ -2,14 +2,38 @@ package snek;
 
 import java.util.Vector;
 import java.awt.Color;
-
+/**
+ * Klasa przechowująca informacje o snake'u gracza, umożliwiająca poruszanie nim
+ */
 public class PlayerSnake implements Snake{
+    /**
+     * Poprzedni kierunek, w którym poruszał się snake
+     */
     private Direction prev_dir;
+    /**
+     * Czy snake jest martwy
+     */
     private boolean is_ded;
+    /**
+     * Wektor segmentów snake'a
+     */
     private Vector<SnakePart> snek = new Vector<SnakePart>();
+    /**
+     * Kolor głowy snake'a - różowy, jeśli snake żyje, i czerwony, jeśli nie
+     */
     private Color headColor;
+    /**
+     * Kolor ciała snake'a, niebieski
+     */
     private Color bodyColor;
 
+    /**
+     * Konstruktor klasy, inicjalizujący zmienne oraz dodający dwa pierwsze segmenty
+     * @param x1 Położenie głowy snake'a na osi X
+     * @param x2 Położenie ogona snake'a na osi X
+     * @param y1 Położenie głowy snake'a na osi Y
+     * @param y2 Położenie ogona snake'a na osi Y
+     */
     public PlayerSnake(int x1, int x2, int y1, int y2){
         prev_dir = Direction.RIGHT; //w prawo
         is_ded = false;
@@ -23,12 +47,9 @@ public class PlayerSnake implements Snake{
     @Override
     public void movePart(int pos) {
         if(pos == 0) return;
-        //jeśli dodaliśmy trzy (po zjedzeniu żaby), to ostantnie kawałki, o umiejscowieniu takim, jak kolejny, zostają
-        //if(snek.get(pos).getX() != snek.get(pos-1).getX() || snek.get(pos).getY() != snek.get(pos-1).getY()){
-            snek.get(pos).setX(snek.get(pos-1).getX());
-            snek.get(pos).setY(snek.get(pos-1).getY());
-        //}
         
+        snek.get(pos).setX(snek.get(pos-1).getX());
+        snek.get(pos).setY(snek.get(pos-1).getY());        
     }
 
     @Override
@@ -48,7 +69,10 @@ public class PlayerSnake implements Snake{
         return false;
     }
 
-
+/**
+ * <p>Dodatkowo sprawdzamy, czy ten kierunek jest dozwolony - nie jest przeciwny do poprzedniego; jeśli jest
+ * przeciwny, za nowy kierunek uznajemy stary</p>
+ */
     @Override
     public void move(Direction dir, int status) {
         //jeśli jesteśmy martwi, nie ruszamy się
@@ -123,12 +147,4 @@ public class PlayerSnake implements Snake{
             return bodyColor;
         }
     }
-
-    // @Override
-    // public void setStatus(boolean dead) {
-    //     is_ded = dead;
-    // }
-
-    
-    
 }

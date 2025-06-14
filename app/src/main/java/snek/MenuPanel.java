@@ -12,18 +12,55 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+/**
+ * Klasa obsługująca ekran menu
+ */
 public class MenuPanel extends JPanel implements ActionListener{
+    /**
+     * Przycisk wyboru trybu jednego gracza
+     */
     private JButton onePlayer;
+    /**
+     * Przycisk wyboru trybu dwóch graczy
+     */
     private JButton twoPlayers;
+    /**
+     * Przycisk wyboru trybu trzech graczy
+     */
     private JButton threePlayers;
+    /**
+     * Przycisk wyboru wyjścia z programu
+     */
     private JButton quit;
+    /**
+     * Layout do wyświetlania
+     */
     private GroupLayout bLayout;
+    /**
+     * Grupa do wyświetlania, w poziomie
+     */
     private GroupLayout.SequentialGroup hGroup;
+    /**
+     * Grupa do wyświetlania, w pionie
+     */
     private GroupLayout.SequentialGroup vGroup;
+    /**
+     * Label na samej górze ekranu
+     */
     private JLabel buttonsTitle;
+    /**
+     * Kontroler z informacją o planszy i stanie gry
+     */
     private GameController g_Controller;
+    /**
+     * Label służący do wyświetlenia wyników
+     */
     private JLabel label;
 
+    /**
+     * Konstrukot, w którym inicjalizowane jest wyświetlanie (grupy) oraz zmienne
+     * @param g Kontroler pobrany z frame
+     */
     public MenuPanel(GameController g){
         g_Controller = g;
         label = new JLabel("<html>High scores: </html>", SwingConstants.CENTER);
@@ -82,6 +119,9 @@ public class MenuPanel extends JPanel implements ActionListener{
         
     }
 
+    /**
+     * Przekazuje dane o wyborze gracza do kontrolera
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == onePlayer){
@@ -98,6 +138,10 @@ public class MenuPanel extends JPanel implements ActionListener{
         }
     }
 
+    /**
+     * Wyświetla 10 najlepszych wyników z listy, jeden pod drugim
+     * @param l Lista wyników
+     */
     public void displayScores(List<Integer> l){
         String s = new String();
         int size = l.size();

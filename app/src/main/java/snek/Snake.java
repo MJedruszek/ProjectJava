@@ -1,42 +1,72 @@
 package snek;
 
 import java.awt.Color;
-
+/**
+ * Interfejs do snake'ów gracza i AI
+ */
 public interface Snake {
     //funkcje do poruszania - kierunek i zmiana pozycji głowy
     //update pozycji - urośnij, przesuń party
     //czy ktoś ode mnie oberwał?
 
-    //aktualna pozycja: x, y głowy - parta o pozycji 0
-    //kierunek do poruszenia się: dir
-    //poprzedni kierunek: prev_dir
-    //jeśli prev_dir i dir są przeciwstawne, zostaw prev_dir
-    //jeśli nie, prev_dir = dir
-    //czy umieram? pytam boarda
-    //jeśli jesteś martwy, zmień zmienną
-    //jeśli żyjesz, gitara
-    //jeśli snek jest żywy: powiększa sneka,
+    /**
+     * <p>Poruszy odpowiednio snake'iem tak, jak nakazuje mu informacja od boarda. Obsługuje także zmianę stanu na
+     * martwy oraz powiększanie snake'a</p>
+     * @param dir Kierunek, w którym poruszy się snake
+     * @param status Co jest na kolejnym polu? 0 - nic, 1 - owoc, 2 - przeszkoda, 3 - żaba
+     */
     abstract void move(Direction dir, int status);
     
-    //wywoływana w move, na koniec i przesuwa party w określonym kierunku
+    /**
+     * Funkcja ma za zadanie przesunąć wszystkie elementy z wektora snake'a do przodu
+     * @param dir Kierunek, w którym ma przesunąć się głowa
+     */
     abstract void update(Direction dir);
 
-    //dodaje num partów na koniec sneka
+    /**
+     * Funkcja dodaje segmenty na koniec snake'a
+     * @param num Liczba segmentów, które należy dodać
+     */
     abstract void addPart(int num);
 
-    //do przemieszczenia kawałka sneka na pozycję tego o 1 przed nim (zaczynamy od końca), głowa jest poruszana w update
+    /**
+     * Funkcja przesuwa segment o jedną pozycję do przodu; jeśli jest to głowa, nie jest tutaj przesuwana
+     * @param pos Pozycja segmentu, który chcemy przesunąć
+     */
     abstract void movePart(int pos);
 
-    //wywoływana, żeby sprawdzić kolizję ze snekiem
+    /**
+     * Funkcja sprawdza, czy na tym miejscu jest któryś z segmentów snake'a
+     * @param x Pozycja sprawdzanego pola na osi X
+     * @param y Pozycja sprawdzanego pola na osi Y
+     * @return True, jeśli to pole jest zajęte przez snake'a, false, jeśli nie
+     */
     abstract boolean checkIfHit(int x, int y);
 
+    /**
+     * Prosty getter, do pobierania pojedynczego segmentu
+     * @param i Numer segmentu, który chcemy pobrać
+     * @return Segment, który chcieliśmy pobrać
+     */
     abstract SnakePart getSnakePart(int i);
 
+    /**
+     * Prosty getter, do pobierania rozmiaru snake'a
+     * @return Rozmiar snake'a
+     */
     abstract int getSnakeSize();
 
+    /**
+     * Prosty getter, do pobierania stanu snake'a
+     * @return True, jeśli snake jest martwy, false, jeśli nie
+     */
     abstract boolean getState();
 
+    /**
+     * Prosty getter koloru snake'a, z rozróżnieniem na głowę i ciało
+     * @param head True, jeśli chcemy pobrać informację o głowie, false, jeśli o ciele
+     * @return Kolor konkretnego segmentu
+     */
     abstract Color getColor(boolean head);
 
-    // abstract void setStatus(boolean dead);
 }
