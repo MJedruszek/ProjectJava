@@ -10,24 +10,64 @@ import java.util.List;
 import java.util.Scanner;
 
 import javax.swing.JFrame;
-
+/**
+ * Klasa odpowiedzialna za sterowanie oknem
+ */
 public class Frame extends JFrame implements Runnable{
     //okno, ustawienia początkowe
+    /**
+     * Szerokość planszy w pixelach
+     */
     private int WIDTH=1024+48;
+    /**
+     * Wysokość planszy w pixelach
+     */
     private int HEIGHT=512+64;
+    /**
+     * Kontroler, ułatwiający komunikację z panelami
+     */
     private GameController g_Controller;
+    /**
+     * Limit FPS dla całego okna
+     */
     private int FPS = 30;
+    /**
+     * Panel odpowiedzialny za pokazywanie menu
+     */
     private MenuPanel mPanel;
+    /**
+     * Panel odpowiedzialny za pokazywanie gry
+     */
     private GamePanel gPanel;
-    private Thread menuThread = new Thread(this); //implementuje runnable
-    //czy należy zmienić panel
+    /**
+     * Wątek obłsugujący menu, implementuje runnable
+     */
+    private Thread menuThread = new Thread(this); 
+    /**
+     * Czy należy zmienić panel na inny, zmieniane na true przy zmianie stanu rozgrywki
+     */
     private boolean panelChanged;
-    //czy panel nie został zmieniony
+    /**
+     * Czy panel nie został zmieniony, do płynnej zmiany paneli
+     */
     private boolean hasChanged;
+    /**
+     * Lista najwyższych wyników, pobierana z i zapisywana do pliku
+     */
     private List<Integer> highScores;
+    /**
+     * Nazwa pliku z wynikami
+     */
     private String f;
+    /**
+     * <p>Wartość, przez którą zostanie przemnożona liczba segmentów snake'a: 1 dla trybu jednoosobowego,
+     * 2 dla trybu dwuosobowego i 3 dla trybu trzyosobowego</p>
+     */
     private int multiplier;
 
+    /**
+     * Kontruktor, inicjalizujący zmienne i funkcje frame'a
+     */
     public Frame(){
         f = "snek_scores.txt";
         g_Controller = new GameController();
@@ -52,6 +92,9 @@ public class Frame extends JFrame implements Runnable{
         multiplier = 1;
     }
 
+    /**
+     * Dodatkowo obsługuje zmianę paneli po zmianie stanu oraz ustawia multiplier, a także zapisuje dane do pliku
+     */
     @Override
     public void run() {
         double drawInterval = 1000000000 / FPS;
@@ -122,6 +165,9 @@ public class Frame extends JFrame implements Runnable{
         }
     }
 
+    /**
+     * Jeśli panel się zmienił, zmienia widok poprzez zmianę stanu zmiennych oraz wywołuje repaint
+     */
     private void update() {
         try{
             Thread.sleep(100);
@@ -136,6 +182,10 @@ public class Frame extends JFrame implements Runnable{
         }
     }
 
+    /**
+     * Wczytuje informacje o wynikach z pliku
+     * @param filename Nazwa pliku, z którego należy pobrać dane
+     */
     private void readFromFile(String filename){
         try {
             File mapFile = new File(filename);
@@ -151,6 +201,10 @@ public class Frame extends JFrame implements Runnable{
         }
     }
 
+    /**
+     * Zapisuje dane o wynikach do pliku
+     * @param filename Nazwa pliku do zapisania informacji
+     */
     private void saveScores(String filename){
         int size;
         if(highScores.size()>10){

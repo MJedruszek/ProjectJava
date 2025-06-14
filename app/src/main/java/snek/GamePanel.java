@@ -9,18 +9,53 @@ import java.awt.event.KeyListener;
 
 import javax.swing.JPanel;
 
+/**
+ * Panel odpowiedzialny za wyświetlanie gry
+ */
 public class GamePanel extends JPanel implements KeyListener, Runnable{
+    /**
+     * Kontroler, który przechowuje informacje o grze
+     */
     private GameController g_Controller; 
+    /**
+     * Szerokość planszy w pixelach
+     */
     private int width;
+    /**
+     * Wysokość planszy w pixelach
+     */
     private int height;   
-    private Thread gameThread = new Thread(this); //implementuje runnable
+    /**
+     * Wątek odpowiedzialny za wyświetlanie, implementuje runnable
+     */
+    private Thread gameThread = new Thread(this); 
+    /**
+     * Górna granica FPS
+     */
     private int FPS = 8;
+    /**
+     * Zmienna służąca do minimalizacji aktualizacji ekranu, zmieniana na true, jeśli została wykryta jakaś zmiana
+     */
     private boolean something_changed;
+    /**
+     * Zmienna odpowiedzialna za zapamiętanie włączenia stanu pauzy
+     */
     private boolean pauza;
+    /**
+     * Kierunek zadany przez gracza za pomocą klawiatury
+     */
     private Direction dir;
+    /**
+     * Czcionka do wyświetlenia informacji po zakończeniu gry
+     */
     private Font f;
 
-
+    /**
+     * Konstruktor, służący do zainicjowania odpowiednich zmiennych, wewnętrznych i domyślnych
+     * @param g Kontroler, przekazany przez Frame
+     * @param w Szerokość planszy w pixelach
+     * @param h Wysokość planszy w pixelach
+     */
     public GamePanel(GameController g, int w, int h){
         g_Controller = g;
         this.setBackground(Color.BLACK);
@@ -42,6 +77,10 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
         requestFocusInWindow();
     }
 
+    /**
+     * <p>Rysuje kolejno: puste pola na planszy, kamienie, jabłka, snake'i, żabę, ikonę pauzy (jeśli jest potrzebna),
+     * informację o zakończeniu gry i liczbie zdobytych punktów (jeśli jest potrzebna)</p>
+     */
     @Override
     public void paintComponent(Graphics g){
         //jedna kratka ma 8x8 pixeli
@@ -108,7 +147,10 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
 
         g.dispose();
     }
-
+    /**
+     * <p>Główna pętla, gdzie co 1 FPS board daje znać swoim wątkom, że powinny wykonać ruch, jeśli nie jesteśmy
+     *  w stanie pauzy </p> 
+     */
     @Override
     public void run() {
         double drawInterval = 1000000000 / FPS;
@@ -117,29 +159,13 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
         long currentTime;
 
         while(gameThread != null){
-            //pętla do boarda:
-            
-            //update - aktualizacja stanu planszy i powiedzieć snekom AI, co się zmieniło
-            //snakeGo dla wszystkich zakolejkowanych kierunków,
-            // żeby zabrać ze sobą ten case, kiedy dwa węże wejdą w to samo miejsce
-            //oraz ten, kiedy wchodzimy w cudzy ogon 
-            //+ snakeGov2 który sprawdzi, na jakiej pozycji znajdą się zaraz sneki, do sprawdzenia później (gdzie głowa, gdzie ogon)
-            // AKTUALIZOWANIE POZYCJI GRACZA I PRZERYSOWYWANIE GO
-            //display - powiedz wszystkim, że coś się zmieniło -> move
-            
-            //do while - current time <= endOfFrame
-            //najpierw - czekamy na akcję AI i użytkownika, potem dajemy im info
-            //Oczekujemy na to, gdzie snek się chce poruszyć
             currentTime = System.nanoTime();
             delta += (currentTime - lastTime) / drawInterval;
             lastTime = currentTime;
             if(delta >= 1){
-                //listen subThreads
-                //dodatkowy while - czeka na kolejne przejśćie
+
                 if(!g_Controller.getBoard().getSnakeStatus(0) && !pauza){
-                // g_Controller.getBoard().updatePlayerSnake(dir);
-                // g_Controller.getBoard().updateAISnake(1);
-                // g_Controller.getBoard().updateAISnake(2);
+
                 g_Controller.getBoard().go(dir);
                 something_changed = true;
             }
@@ -150,7 +176,9 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
     }
 
 
-
+    /**
+     * Jeśli coś się zmieniło oraz stan gry wskazuje na aktywną grę, repaint
+     */
     private void update() {
         if(something_changed && (g_Controller.getState() == GameState.ONE_PLAYER || g_Controller.getState() == GameState.TWO_PLAYER || g_Controller.getState() == GameState.THREE_PLAYER)){
             //System.out.println("HERE");
@@ -164,7 +192,12 @@ public class GamePanel extends JPanel implements KeyListener, Runnable{
     public void keyTyped(KeyEvent e) {
     }
 
-
+    /**
+     * <p>Na wciśnięcie przycisku 'p' włączamy pauzę, wyłączenie jej jest powodowane przez wciśnięcie dowolnego
+     * innego od 'p' przycisku</p>
+     * <p> Wciśnięcie przycisku 'w' ustala kierunek w górę, 'a' na kierunek w lewo, 's' na kierunek w dół, a 'd'
+     * na kierunek w prawo</p>
+     */
     @Override
     public void keyPressed(KeyEvent e) {
         if(e.getKeyChar()=='p'){

@@ -1,31 +1,78 @@
 package snek;
 
 import java.awt.Color;
-// import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
+/**
+ * <p>Klasa odpowiedzialna za przechowywanie planszy: snakex3, żaba, owoce i kamienie. Zna stan planszy, mówi
+ * snake'om i żabie, gdzie powinny się przemieścić, i trzyma algorytmy umożliwiające AI sterowanie. To tutaj
+ * zaimplementowane są wątki, które umożliwiają równoległe działanie programu</p>
+ */
 public class Board {
+    /**
+     * <p>Lista przedmiotów nieruchomych (owoce i kamienie). Od 0 do 9 są kamienie, od 10 do 14 są owoce</p>
+     */
     private List<Item> items;
-
+    /**
+     * <p>Szerokość planszy</p>
+     */
     private int width;
+    /**
+     * <p>Wysokość planszy</p>
+     */
     private int height;
+    /**
+     * <p>Snake sterowany przez gracza, aktywny w każdym z trybów</p>
+     */
     private PlayerSnake snek1;
+    /**
+     * <p>Snake sterowany przez prosty algorytm, aktywny w dwu- i trzyosobowym trybie rozgrywki</p>
+     */
     private AISnake snek2;
+    /**
+     * <p>Snake sterowany przez prosty algorytm, aktywny tylko w trzyosobowym trybie rozgrywki</p>
+     */
     private AISnake snek3;
+    /**
+     * <p>Poprzedni kierunek, w którym podążał snake gracza</p>
+     */
     private Direction prev_dir;
+    /**
+     * <p>Nowy kierunek, w którym będzie podążał snake gracza</p>
+     */
     private Direction new_dir;
+    /**
+     * <p>Wątki odpowiedzialne za obsługę snake'ów i żaby. t[0] to snake gracza, t[1] to snakeAI nr 2, t[2] to snakeAI nr 3,
+     * a t[3] to żaba</p>
+     */
     private Thread[] t;
+    /**
+     * <p>Żaba, sterowana prostym algorytmem. Jej zadaniem jest uciekanie od snake'ów, a po zjedzeniu da 3 punkty</p>
+     */
     private Frog forg;
-    // private Point[] next_positions;
-    // private Point[] past_tail_positions;
+    /**
+     * <p>Bariera, umożliwiająca synchronizację między wątkami przed postawieniem ruchu</p>
+     */
     private CyclicBarrier barrier;
+    /**
+     * <p>Bariera, umożliwiająca synchronizacją między wątkami w oczekiwaniu na polecenie wykonania ruchu</p>
+     */
     private CyclicBarrier finished_barrier;
+    /**
+     * <p>Zmienna pomocnicza, umożliwiająca sterowanie pracą wątków</p>
+     */
     private boolean shouldWork;
 
+    /**
+     * <p>Funkcja umożliwiająca sprawdzenie, czy dane miejsce na planszy jest zajęte i, jeśli tak, to przez co</p>
+     * @param x Położenie obiektu na osi X
+     * @param y Położenie obiektu na osi Y
+     * @return 0, jeśli puste; 1, jeśli owoc; 2, jeśli kamień, snake lub koniec planszy; 3, jeśli żaba
+     */
     private int isTaken(int x, int y){
         for(Item i:  items){
             if(i.getX() == x && i.getY() == y){
@@ -59,6 +106,12 @@ public class Board {
         return 0;
     }
 
+    /**
+     * <p>Pozwala znaleźć owoc o zadanej pozycji</p>
+     * @param x Położenie poszukiwanego owocu na osi X
+     * @param y Położenie poszukiwanego owocu na osi Y
+     * @return Pozycja owocu w wektorze items, jeśli znaleziono; -1, jeśli nie znaleziono
+     */
     private int findFruitByPosition(int x, int y){
         for(int i = 10; i<15; i++){
             if(items.get(i).getX() == x && items.get(i).getY() == y){
@@ -68,6 +121,14 @@ public class Board {
         return -1;
     }
 
+    /**
+     * <p>Poruszanie określonym snake'iem, poprzez wydanie mu odpowiedniego polecenia. Oprócz tego
+     * funkcja automatycznie zmienia pozycję owoca, który został przed chwilą zjedzony przez snake'a
+     * i informuje żabę o konieczności zmiany miejsca przez zmianę jej statusu</p>
+     * @param dir Kierunek, w którym teraz powienien pójść snake
+     * @param s Który snake powinien się poruszyć: 0 - gracz, 1 - snakeAI nr 2, 2 - snakeAI nr 3
+     * @return Wynik przejścia na nową pozycję, czyli co zwróci funkcja isTaken dla nowej pozycji głowy
+     */
     private int snakeGo(Direction dir, int s){
         int result = 0;
         
@@ -139,6 +200,10 @@ public class Board {
         return result;
     }
 
+    /**
+     * <p>Funkcja odpowiedzialna za dodanie nowego elementu, kamienia lub owocu</p>
+     * @param type Jeśli kamień true, jeśli owoc false
+     */
     private void addItem(boolean type){
         boolean found = false;
         while(!found){
@@ -152,6 +217,9 @@ public class Board {
         }
     }
 
+    /**
+     * <p>Funkcja generuje obiekty na planszy, 10 kamieni i 5 owoców</p>
+     */
     private void generateAllItems(){
         items.clear();
         //dodaj 10 kamieni
@@ -164,6 +232,11 @@ public class Board {
         }
     }
 
+    /**
+     * <p>Funkcja generuje snake'a, wyszukując dla niego dwóch pustych miejsc po sobie, co najmniej
+     * trzy kratki od każdej ściany</p>
+     * @param i Numer snake'a, który powinien zostać wygenerowany: 0 oznacza gracza, 1 snakeAI nr 2, 2 snakeAI nr 3
+     */
     private void generateSnek(int i){
         boolean found = false;
         while(!found){
@@ -189,6 +262,9 @@ public class Board {
         }
     }
 
+    /**
+     * <p>Funkcja szuka wolnego miejsca dla żaby</p>
+     */
     private void generateFrog(){
         boolean found = false;
         while(!found){
@@ -202,6 +278,12 @@ public class Board {
         }
     }
 
+    /**
+     * <p>Kontruktor klasy Board. Inicjalizuje wątki oraz wszystkie zmienne, a także układa planszę</p>
+     * @param width Szerokość planszy
+     * @param height Wysokość planszy
+     * @param s Liczba snake'ów do wygenerowania
+     */
     public Board(int width, int height, int s){
         shouldWork = false;
         items = new ArrayList<>();
@@ -215,14 +297,6 @@ public class Board {
         snek2 = null;
         snek3 = null;
         generateFrog();
-        // next_positions = new Point[3];
-        // for(int j = 0; j<3; j++){
-        //     next_positions[j] = new Point(-2,-2);
-        // }
-        // past_tail_positions = new Point[3];
-        // for(int j = 0; j<3; j++){
-        //     past_tail_positions[j] = new Point(-2,-2);
-        // }
         new_dir = Direction.RIGHT;
         t = new Thread[4];
         t[0] = new Thread(){
@@ -312,10 +386,21 @@ public class Board {
         
     }
 
+    /**
+     * <p>Prosty getter, na potrzeby wyświetlania</p>
+     * @param i Który element chcemy pobrać
+     * @return Element, który chcieliśmy pobrać
+     */
     public Item getItem(int i){
         return items.get(i);
     }
 
+    /**
+     * <p>Prosty getter, na potrzeby wyświetlania</p>
+     * @param i Który element snake'a chcemy pobrać
+     * @param s Którego snake'a chcemy pobrać; 0 - snake gracza, 1 - snakeAI nr 2, 2 - snakeAI nr 3
+     * @return Element, który chcieliśmy pobrać
+     */
     public SnakePart getSnakePart(int i, int s){
         if(s == 0){
             return snek1.getSnakePart(i);
@@ -333,6 +418,11 @@ public class Board {
         
     }
 
+    /**
+     * <p>Funkcja umożliwiająca pobranie informacji o rozmiarze snake'a</p>
+     * @param i Snake, którego długość chcemy pobrać; 0 - snake gracza, 1 - snakeAI nr 2, 2 - snakeAI nr 3
+     * @return długość snake'a
+     */
     public int getSnakeSize(int i){
         if(i==0){
             return snek1.getSnakeSize();
@@ -348,6 +438,11 @@ public class Board {
         }
     }
 
+    /**
+     * <p>Funkcja zwracająca informację, czy snake jest martwy</p>
+     * @param s Numer snake'a, o którym chcemy pobrać informację; 0 - snake gracza, 1 - snakeAI nr 2, 2 - snakeAI nr 3
+     * @return True, jeśli snake jest martwy, False, jeśli jest żywy
+     */
     public boolean getSnakeStatus(int s){
         if(s==0){
             return snek1.getState();
@@ -363,27 +458,14 @@ public class Board {
         }
     }
 
+    /**
+     * <p>Funkcja, która najpierw oblicza, co jest na kolejnym miejscu na planszy, a następnie oczekuje na
+     * przyjście pozostałych snake'ów, po czym przekazuje tę informację do snake'a i każe mu się poruszyć.</p>
+     * @param dir Kierunek, w którym snake się poruszy
+     */
     public void updatePlayerSnake(Direction dir){
         int next = snakeGo(dir, 0); //sprawdzamy dla sneka gracza
-        // if(!snek1.getState()) {
-        //     next_positions[0] = new Point(
-        //         snek1.getSnakePart(0).getX() + dir.getX(),
-        //         snek1.getSnakePart(0).getY() + dir.getY()
-        //     );
-        //     //jedyna sytuacja, kiedy ogon ucieknie: nic tam nie ma, w pozostałych i tak snek umrze
-        //     //ogon to size-1
-        //     if(next == 0){
-        //         past_tail_positions[0] = new Point(
-        //             snek1.getSnakePart(getSnakeSize(0)-1).getX(),
-        //             snek1.getSnakePart(getSnakeSize(0)-1).getY()
-        //         );
-        //     }
-        // }
-        //snek jest martwy, już nigdzie nie pójdzie, umarł w poprzednim kroku
-        // else {
-        //     next_positions[0] = new Point(-1,-1);
-        //     past_tail_positions[0] = new Point(-1, -1);
-        // }
+        
         //Czekamy, aż wszyscy tu przyjdą
         try {
             barrier.await();
@@ -392,39 +474,19 @@ public class Board {
         } catch (BrokenBarrierException e) {
             e.printStackTrace();
         }
-        // boolean dont_die = false;
-        // //miał wpaść na ogon sneka 1, nie zrobi tego
-        // if(next_positions[0]==past_tail_positions[0]){
-        //     //miały się zderzyć głowa ogon, nie zrobią tego
-        //     printStuff();
-        //     dont_die = true;
-        // }
-        // else if(snek2!=null && next_positions[0]==past_tail_positions[1]){
-        //     //miały się zderzyć głowa ogon, nie zrobią tego
-        //     printStuff();
-        //     dont_die = true;
-        // }
-        // else if(snek3 != null && next_positions[0]==past_tail_positions[2]){
-        //     //miały się zderzyć głowa ogon, nie zrobią tego
-        //     printStuff();
-        //     dont_die = true;
-        // }
         snek1.move(dir, next); //snek idzie
-        // if(dont_die) snek1.setStatus(false);
     }
 
+    /**
+     * <p>Resetuje planszę i snake'i po rozpoczęciu nowej rozgrywki</p>
+     * @param i Ile snake'ów należy włączyć
+     */
     public void reset(int i){
         prev_dir = Direction.RIGHT;
-        //resetujemy też ten wektor
-        // for(int j = 0; j<3; j++){
-        //     next_positions[j] = new Point(-2,-2);
-        // }
-        // for(int j = 0; j<3; j++){
-        //     past_tail_positions[j] = new Point(-2,-2);
-        // }
         barrier = new CyclicBarrier(3);
         generateAllItems();
         generateSnek(0);
+        generateFrog();
         snek2 = null;
         snek3 = null;
         if(i == 0){
@@ -439,6 +501,12 @@ public class Board {
         
     }
 
+    /**
+     * <p>Funkcja zwracająca kolor danego segmentu snake'a, do wyświetlania</p>
+     * @param i Snake, którego kolor chcemy pobrać; 0 - snake gracza, 1 - snakeAI nr 2, 2 - snakeAI nr 3
+     * @param head True, jeśli chodzi nam o kolor głowy, false, jeśli o kolor ciała
+     * @return Kolor danego segmentu
+     */
     public Color getSnakeColor(int i, boolean head){
         if(i == 0){
             return snek1.getColor(head);
@@ -454,30 +522,16 @@ public class Board {
         }
     }
 
+    /**
+     * <p>Funkcja odpowiedzialna za włączenie funkcji obliczającej kolejny ruch, odczekanie, aż pozostałe nadążą i
+     * poruszenie snake'iem. Jeśli snake jest nieaktywny, włączamy od razu barierę, aby wątki nie wisiały
+     * czekając na nieaktywny wątek</p>
+     * @param s Numer snake'a, który ma się poruszyć: 1 - snakeAI nr 2, 2 - snakeAI nr 3
+     */
     public void updateAISnake(int s){
         if(s == 1 && snek2!=null){
             Direction dir = findAIMove(s);
             int next = snakeGo(dir, s);
-            // if(!snek2.getState()) {
-            //     next_positions[s] = new Point(
-            //         snek2.getSnakePart(0).getX() + dir.getX(),
-            //         snek2.getSnakePart(0).getY() + dir.getY()
-            //     );
-            //     //jedyna sytuacja, kiedy ogon ucieknie: nic tam nie ma, w pozostałych i tak snek umrze
-            //     //ogon jest na pozycji size-1
-            //     if(next == 0){
-            //         past_tail_positions[1] = new Point(
-            //             snek2.getSnakePart(snek2.getSnakeSize()-1).getX(),
-            //             snek2.getSnakePart(snek2.getSnakeSize()-1).getY()
-            //         );
-            //     }
-            // }
-            // //snek jest martwy, już nigdzie nie pójdzie, umarł w poprzednim kroku
-            // else {
-            //     next_positions[s] = new Point(-1,-1);
-            //     past_tail_positions[s] = new Point(-1, -1);
-            // }
-            //1 przypadek: nie wszyscy żywi skończyli, czekamy
             try {
                 barrier.await();
             } catch (InterruptedException e) {
@@ -485,24 +539,7 @@ public class Board {
             } catch (BrokenBarrierException e) {
                 e.printStackTrace();
             }
-            // boolean dont_die = false;
-            // if(next_positions[1]==past_tail_positions[0]){
-            // //miały się zderzyć głowa ogon, nie zrobią tego
-            //     printStuff();
-            //     dont_die = true;
-            // }
-            // else if(next_positions[1]==past_tail_positions[1]){
-            //     //miały się zderzyć głowa ogon, nie zrobią tego
-            //     printStuff();
-            //     dont_die = true;
-            // }
-            // else if(snek3 != null && next_positions[1]==past_tail_positions[2]){
-            //     //miały się zderzyć głowa ogon, nie zrobią tego
-            //     printStuff();
-            //     dont_die = true;
-            // }
             snek2.move(dir, next);
-            // if(dont_die) snek2.setStatus(false);
         }
         //snake nieaktywny
         else if(s == 1){
@@ -517,26 +554,6 @@ public class Board {
         if(s == 2 && snek3!=null){
             Direction dir = findAIMove(s);
             int next = snakeGo(dir, s);
-            // if(!snek3.getState()) {
-            //     next_positions[s] = new Point(
-            //         snek3.getSnakePart(0).getX() + dir.getX(),
-            //         snek3.getSnakePart(0).getY() + dir.getY()
-            //     );
-            //     //jedyna sytuacja, kiedy ogon ucieknie: nic tam nie ma, w pozostałych i tak snek umrze
-            //     //ogon jest na pozycji size-1
-            //     if(next == 0){
-            //         past_tail_positions[2] = new Point(
-            //             snek3.getSnakePart(snek3.getSnakeSize()-1).getX(),
-            //             snek3.getSnakePart(snek3.getSnakeSize()-1).getY()
-            //         );
-            //     }
-            // }
-            // //snek jest martwy, już nigdzie nie pójdzie, umarł w poprzednim kroku
-            // else {
-            //     next_positions[s] = new Point(-1,-1);
-            //     past_tail_positions[s] = new Point(-1, -1);
-            // }
-            //1 przypadek: nie wszyscy żywi skończyli, czekamy
             try {
                 barrier.await();
             } catch (InterruptedException e) {
@@ -544,24 +561,7 @@ public class Board {
             } catch (BrokenBarrierException e) {
                 e.printStackTrace();
             }
-            // boolean dont_die = false;
-            // if(next_positions[2]==past_tail_positions[0]){
-            //     //miały się zderzyć głowa ogon, nie zrobią tego
-            //     printStuff();
-            //     dont_die = true;
-            // }
-            // else if(next_positions[2]==past_tail_positions[1]){
-            //     //miały się zderzyć głowa ogon, nie zrobią tego
-            //     printStuff();
-            //     dont_die = true;
-            // }
-            // else if(next_positions[2]==past_tail_positions[2]){
-            //     //miały się zderzyć głowa ogon, nie zrobią tego
-            //     printStuff();
-            //     dont_die = true;
-            // }
             snek3.move(dir, next);
-            // if(dont_die) snek3.setStatus(false);
         }
         //snake nieaktywny
         else if(s == 2){
@@ -575,7 +575,12 @@ public class Board {
         }
     }
 
-    //znajduje najbliższy owocek
+    /**
+     * <p>Funkcja do snake'ów AI, szukająca najbliższego owocu</p>
+     * @param x Położenie głowy na osi X
+     * @param y Położenie głowy na osi Y
+     * @return Najbliższy znaleziony owoc
+     */
     private int findClosest(int x, int y){
         int distance = 10000;
         int curr=-1;
@@ -590,6 +595,14 @@ public class Board {
         return curr;
     }
 
+    /**
+     * <p>Szuka najlepszego możliwego ruchu dla snake'a; najpierw znajduje aktualne położenie i kierunek snake'a, 
+     * następnie szuka najbliższego do niego owocu, po czym szuka kierunku, który się najbardziej opłaca. </p>
+     * <p>W trakcie poszukiwania kierunku najpierw sprawdzane jest, czy kierunek umożliwia zjedzenie owocu, następnie,
+     * czy zbliży węża do owocu, a na koniec, czy którykolwiek z kierunków umożliwi uniknięcie śmierci.</p>
+     * @param s Numer snake'a, dla którego należy znaleźć kierunek: 1 - snakeAI nr 2, 2 - snakeAI nr 3
+     * @return Kierunek, w który snake powinien się poruszyć
+     */
     private Direction findAIMove(int s){
         int currx=0;
         int curry=0;
@@ -686,6 +699,13 @@ public class Board {
         return prev;
     }
 
+    /**
+     * <p>Poszukiwanie najlepszego możliwego ruchu dla żaby: jeśli pole jest puste, sprawdzamy czy pójście tam
+     * umożliwia oddalenie się od snake</p>
+     * @param dist Aktualna odległość od najbliższego snake'a
+     * @param closest Który snake jest aktualnie najbliższy: 0 - snake gracza, 1 - snakeAI nr 2, 2 - snakeAI nr 3
+     * @return Kierunek, który da żabie największe korzyści
+     */
     private Direction checkBest(int dist, int closest){
         int tmp = 0;
         if(closest == 0){
@@ -792,6 +812,12 @@ public class Board {
         }
     }
 
+    /**
+     * <p>Funkcja odpowiedzialna za poruszanie żabą.</p>
+     * <p>Jeśli żaba została zjedzona w poprzednim ruchu, należy znaleźć jej nowe miejsce za pomocą generateFrog()</p>
+     * <p>Jeśli żaba nie została zjedzona, należy znaleźć snake'a najbliższego do żaby, znaleźć opcję, która
+     * najbardziej ją od niego oddali, a następnie przemieścić ją zgodnie z tym kierunkiem</p>
+     */
     private void updateFrog(){
         //żaba została zjedzona
         if(forg.getStatus()){
@@ -835,70 +861,50 @@ public class Board {
 
     }
 
+    /**
+     * Prosty getter, do wyświetlania żaby
+     * @return Żaba 
+     */
     public Frog getFrog(){
         return forg;
     }
 
-    // private void checkHeadToHead(){
-    //     if(next_positions[0] == next_positions[1]){
-    //         //zaraz zderzą się głowami, pora je zabić
-    //         snek1.setStatus(true);
-    //         if(snek2!= null) snek2.setStatus(true);
-    //     }
-    //     if(next_positions[0] == next_positions[2]){
-    //         snek1.setStatus(true);
-    //         if(snek3!=null) snek3.setStatus(true);
-    //     }
-    //     if(next_positions[1] == next_positions[2]){
-    //         if(snek2!=null) snek2.setStatus(true);
-    //         if(snek3!=null) snek3.setStatus(true);
-    //     }
-    // }
-
-    // private void printStuff(){
-    //     for (int i=0; i<3; i++) {
-    //         System.out.println("Snek " + i);
-    //         System.out.println("Head " + next_positions[i]);
-    //         System.out.println("Tail " + past_tail_positions[i]);
-    //     }
-    // }
-
-
+    /**
+     * <p>Ta funkcja włącza wątki poprzez wykorzystanie funkcji startMove() i przekazuje kierunek, w którym ma
+     * się poruszyć snake gracza, otrzymany od GamePanelu</p>
+     * @param dir Kierunek, który należy wpisać do zmiennej new_dir dla snake'a gracza
+     */
     public void go(Direction dir){
-        //do sneka gracza
-
-
-        //jeśli gracz już nie żyje, nie idziemy dalej
-        // if(snek1.getState()){
-        //     return;
-        // }
         new_dir = dir;
         startMove();
-        
 
-        //po updatowaniu sprawdzamy, czy któryś nie umarł na darmo albo nie umarł a powinien
-        //sprawdzamy, czy ktoś nie zderzył się głowami - dwie głowy mają to samo value
-        // checkHeadToHead();
-        //sam koniec - resetujemy aktywne węże na -2, -2
-        // for(int j = 0; j<3; j++){
-        //     next_positions[j] = new Point(-2,-2);
-        // }
-        // for(int j = 0; j<3; j++){
-        //     past_tail_positions[j] = new Point(-2,-2);
-        // }
     }
 
+    /**
+     * Funkcja umożliwia oczekiwanie na sygnał rozpoczęcia pracy wątkom snake'ów
+     * @throws InterruptedException Wyrzucane przez wait()
+     */
     public synchronized void waitForSignal() throws InterruptedException {
         while (!shouldWork) wait();
     }
 
+    /**
+     * <p>Funkcja, która umożliwia włączanie ruchu w odpowiednim momencie. Zmienia stan zmiennej shouldWork, a
+     * następnie informuje o tym oczekujące wątki</p>
+     */
     public synchronized void startMove() {
         shouldWork = true;
         notifyAll();
     }
 
+    /**
+     * <p>Funkcja, która jest wywoływana przez wątki po zakończeniu pracy. Kiedy zakończą swoje ruchy, 
+     * czekają na zwolnienie bariery, a następnie ustawiają zmienną shouldWork na false, dzięki czemu później,
+     * w kolejnej pętli run(), zaczekają na sygnał od boarda</p>
+     * @throws Exception Wyrzucane przez await()
+     */
     public void finishMove() throws Exception {
-        finished_barrier.await();  // Workers wait here until all finish
-        shouldWork = false;  // Reset only after all threads sync
+        finished_barrier.await();
+        shouldWork = false; 
     }
 }

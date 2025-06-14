@@ -1,14 +1,10 @@
 package snek;
 
-
-
-
-
+/**
+ * <p>Klasa odpowiedzialna za obsługę całej aplikacji, włączająca frame.</p>
+ */
 public class App {
-   //frame - okienko, panel - wyczyść kanwę? co to znaczy 
-   //paneli może być kilka, nie muszą być rozmiaru frame'a
-
     public static void main(String[] args) {
-        new Frame(); //elo benc
+        new Frame();
     }
 }
